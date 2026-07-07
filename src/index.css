@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #e0e5ec; /* changed to neumorphic base */
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f5f9;
+  --color-accent: #2563eb; /* blue-600 */
+  --color-accent-light: #60a5fa; /* blue-400 */
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+}
+
+body {
+  @apply bg-bg text-slate-900 min-h-screen antialiased;
+}
+
+/* Custom styles for animations */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Neumorphism Base Styles */
+.neu-bg {
+  background-color: #e0e5ec;
+}
+
+.neu-card {
+  background-color: #e0e5ec;
+  box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6), 
+             -9px -9px 16px rgba(255, 255, 255, 0.5);
+  border: none;
+}
+
+.neu-circle {
+  background-color: #e0e5ec;
+  border-radius: 50%;
+  box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6), 
+             -9px -9px 16px rgba(255, 255, 255, 0.5);
+  border: none;
+}
+
+.neu-pressed {
+  background-color: #e0e5ec;
+  box-shadow: inset 6px 6px 10px 0 rgba(163, 177, 198, 0.6), 
+              inset -6px -6px 10px 0 rgba(255, 255, 255, 0.5);
+  border: none;
+}
+
+/* Neumorphic interactive element */
+.neu-button {
+  background-color: #e0e5ec;
+  box-shadow: 5px 5px 10px rgba(163, 177, 198, 0.6), 
+             -5px -5px 10px rgba(255, 255, 255, 0.5);
+  transition: all 0.2s ease-in-out;
+}
+.neu-button:active {
+  box-shadow: inset 4px 4px 8px rgba(163, 177, 198, 0.6), 
+              inset -4px -4px 8px rgba(255, 255, 255, 0.5);
+}

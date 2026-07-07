@@ -1,0 +1,202 @@
+import { useState, useEffect, useCallback } from 'react'
+import StatusScreens from './components/StatusScreens'
+import DashboardTab from './components/DashboardTab'
+import RegisterTab from './components/RegisterTab'
+import WalletTab from './components/WalletTab'
+import LeaderboardTab from './components/LeaderboardTab'
+import OnboardingModal from './components/OnboardingModal'
+import { LayoutDashboard, UserPlus, Wallet, Trophy } from 'lucide-react'
+import { useLanguage } from './hooks/useLanguage'
+import { api } from './api'
+
+type Screen = 'loading' | 'pending' | 'main' | 'success'
+type Tab = 'dashboard' | 'register' | 'wallet' | 'leaderboard'
+
+interface Agent {
+  id: string
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  document_update_used: boolean
+  full_name: string | null
+}
+
+const tg = window.Telegram?.WebApp
+
+export default function App() {
+  const [screen, setScreen] = useState<Screen>('loading')
+  const [activeTab, setActiveTab] = useState<Tab>('dashboard')
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const { t, language, setLanguage } = useLanguage()
+  const [agent, setAgent] = useState<Agent | null>(null)
+  const [token, setToken] = useState('')
+  const [error, setError] = useState('')
+  const [stats, setStats] = useState<any>(null)
+  const [myDrivers, setMyDrivers] = useState<any[]>([])
+  const [loadingStats, setLoadingStats] = useState(false)
+
+  // Configure Telegram Theme
+  useEffect(() => {
+    tg?.ready();
+    tg?.expand();
+    
+    // We disable Telegram background sync because Neumorphism strictly requires a specific #e0e5ec hex
+    // if (tg?.themeParams?.bg_color) {
+    //   document.body.style.backgroundColor = tg.themeParams.bg_color;
+    // }
+  }, [])
+
+  const applyReferralCode = useCallback(async (code: string, agentId: string) => {
+    try {
+      await api.post('/referral/validate', { code, agent_id: agentId })
+    } catch (e) {
+      console.warn('Failed to apply referral code:', e)
+    }
+  }, [])
+
+  const init = useCallback(async () => {
+    const initData = tg?.initData
+    if (!initData) { setScreen('main'); return }
+    try {
+      const data = await api.post('/auth/telegram', { telegram_init_data: initData })
+      
+      setToken(data.token)
+      api.setToken(data.token) // Set global token for future requests
+      setAgent(data.agent)
+      
+      const startParam = tg?.initDataUnsafe?.start_param
+      if (startParam && data.agent.status === 'PENDING') {
+        await applyReferralCode(startParam, data.agent.id)
+        setAgent(prev => prev ? { ...prev, status: 'APPROVED' } : prev)
+        setScreen('main')
+        return
+      }
+
+      if (data.agent.status === 'APPROVED') setScreen('main')
+      else if (data.agent.status === 'PENDING') setScreen('pending')
+      else { setError('Your account has been rejected.'); setScreen('pending') }
+    } catch (e: any) {
+      setError('Connection error. Please try again.')
+      setScreen('loading')
+    }
+  }, [applyReferralCode])
+
+  const fetchMyDrivers = useCallback(async () => {
+    if (!token) return
+    setLoadingStats(true)
+    try {
+      const data = await api.get('/drivers/me')
+      setStats(data.stats)
+      setMyDrivers(data.drivers || [])
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoadingStats(false)
+    }
+  }, [token])
+
+  useEffect(() => {
+    init()
+  }, [init])
+
+  useEffect(() => {
+    if (screen === 'main' && activeTab === 'dashboard') {
+      fetchMyDrivers()
+    }
+  }, [screen, activeTab, fetchMyDrivers])
+
+  useEffect(() => {
+    if (screen === 'main' && !localStorage.getItem('agent_onboarding_v2')) {
+      setShowOnboarding(true)
+    }
+  }, [screen])
+
+  // Non-main screens
+  if (screen !== 'main') {
+    return (
+      <StatusScreens
+        screen={screen}
+        error={error}
+        onSuccessContinue={() => { setScreen('main'); setActiveTab('dashboard') }}
+      />
+    )
+  }
+
+  if (showOnboarding) {
+    return <OnboardingModal onComplete={() => {
+      localStorage.setItem('agent_onboarding_v2', 'true')
+      setShowOnboarding(false)
+    }} />
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen neu-bg pb-20">
+
+      {/* Header */}
+      <div className="flex items-center gap-3 px-5 py-4 bg-blue-600 sticky top-0 z-10 shadow-md">
+        <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center shadow-inner">
+          <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain filter brightness-0 invert"
+            onError={e => (e.currentTarget.style.display = 'none')} />
+        </div>
+        <div className="flex-1">
+          <h1 className="text-base font-bold text-white leading-tight">{t('app.title')}</h1>
+          <p className="text-[11px] text-blue-200">{agent?.full_name || t('app.agent_portal')}</p>
+        </div>
+        
+        {/* Language Toggle */}
+        <div className="flex items-center bg-blue-700 rounded-lg p-1 shrink-0 shadow-inner">
+          <button
+            onClick={() => {
+              setLanguage('en')
+              tg?.HapticFeedback?.selectionChanged()
+            }}
+            className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${language === 'en' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-200 hover:text-white'}`}
+          >
+            EN
+          </button>
+          <button
+            onClick={() => {
+              setLanguage('am')
+              tg?.HapticFeedback?.selectionChanged()
+            }}
+            className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${language === 'am' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-200 hover:text-white'}`}
+          >
+            አማ
+          </button>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="flex-1 overflow-y-auto p-4 max-w-md mx-auto w-full">
+        {activeTab === 'dashboard' && (
+          <DashboardTab stats={stats} drivers={myDrivers} loading={loadingStats} />
+        )}
+        {activeTab === 'register' && (
+          <RegisterTab token={token} onSuccess={() => setScreen('success')} />
+        )}
+        {activeTab === 'wallet' && <WalletTab stats={stats} agent={agent} drivers={myDrivers} onUpdateAgent={init} />}
+        {activeTab === 'leaderboard' && <LeaderboardTab />}
+      </div>
+
+      {/* Bottom Nav */}
+      <nav className="fixed bottom-0 w-full neu-bg pb-safe shadow-[0_-10px_20px_rgba(163,177,198,0.4)] z-20 border-t-2 border-white">
+        <div className="flex justify-around items-center h-16 px-2">
+          <button onClick={() => { setActiveTab('dashboard'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'dashboard' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
+            <LayoutDashboard className={`w-5 h-5 ${activeTab === 'dashboard' ? 'fill-blue-50' : ''}`} />
+            <span className="text-[10px] font-bold tracking-wide">{t('nav.home')}</span>
+          </button>
+          <button onClick={() => { setActiveTab('register'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'register' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
+            <UserPlus className={`w-5 h-5 ${activeTab === 'register' ? 'fill-blue-50' : ''}`} />
+            <span className="text-[10px] font-bold tracking-wide">{t('nav.register')}</span>
+          </button>
+          <button onClick={() => { setActiveTab('wallet'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'wallet' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
+            <Wallet className={`w-5 h-5 ${activeTab === 'wallet' ? 'fill-blue-50' : ''}`} />
+            <span className="text-[10px] font-bold tracking-wide">{t('nav.wallet')}</span>
+          </button>
+          <button onClick={() => { setActiveTab('leaderboard'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'leaderboard' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
+            <Trophy className={`w-5 h-5 ${activeTab === 'leaderboard' ? 'fill-blue-50' : ''}`} />
+            <span className="text-[10px] font-bold tracking-wide">{t('nav.top_agents')}</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  )
+}
