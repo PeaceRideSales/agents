@@ -14,7 +14,9 @@ const tg = window.Telegram?.WebApp
 export default function RegisterTab({ token, onSuccess }: RegisterTabProps) {
   const [form, setForm] = useState({
     full_name: '', phone: '', license_plate: '',
-    car_model: '', location: '',
+    car_model: '',
+    vehicle_category: 'OLDER',
+    location: 'Addis Ababa'
   })
   const [file, setFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -120,6 +122,15 @@ export default function RegisterTab({ token, onSuccess }: RegisterTabProps) {
               className={`${inputCls} uppercase`} disabled={submitting} />
             <input type="text" placeholder="Car Model (e.g. Toyota Axio, Vitz, Corolla) *" value={form.car_model}
               onChange={e => setField('car_model', e.target.value)} className={inputCls} disabled={submitting} />
+            <select
+              value={form.vehicle_category}
+              onChange={e => setField('vehicle_category', e.target.value)}
+              className={inputCls}
+              disabled={submitting}
+            >
+              <option value="OLDER">Standard / Older Model (Pre-2020)</option>
+              <option value="LATEST_OR_EV">Latest Model (2020+) or EV</option>
+            </select>
           </div>
         </div>
 
