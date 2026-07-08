@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLanguage } from '../hooks/useLanguage'
 import { api } from '../api'
 
-type CarType = 'SEDAN' | 'SUV' | 'PICKUP' | 'VAN' | 'BUS' | 'OTHER'
+
 
 interface RegisterTabProps {
   token: string
@@ -14,7 +14,7 @@ const tg = window.Telegram?.WebApp
 export default function RegisterTab({ token, onSuccess }: RegisterTabProps) {
   const [form, setForm] = useState({
     full_name: '', phone: '', license_plate: '',
-    car_type: '' as CarType | '', car_model: '', location: '',
+    car_model: '', location: '',
   })
   const [file, setFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -43,7 +43,7 @@ export default function RegisterTab({ token, onSuccess }: RegisterTabProps) {
     e.preventDefault()
     setError('')
     
-    if (!form.full_name || !form.phone || !form.license_plate || !form.car_type || !form.car_model || !form.location) {
+    if (!form.full_name || !form.phone || !form.license_plate || !form.car_model || !form.location) {
       setError('Please fill in all required fields')
       tg?.HapticFeedback?.notificationOccurred('error')
       return
@@ -102,14 +102,7 @@ export default function RegisterTab({ token, onSuccess }: RegisterTabProps) {
             <input type="text" placeholder={`${t('register.license_plate')} *`} value={form.license_plate}
               onChange={e => setField('license_plate', e.target.value.toUpperCase())}
               className={`${inputCls} uppercase`} disabled={submitting} />
-            <select value={form.car_type} onChange={e => setField('car_type', e.target.value)}
-              className={`${inputCls} appearance-none`} disabled={submitting}>
-              <option value="" disabled>{t('register.car_type')} *</option>
-              {['SEDAN','SUV','PICKUP','VAN','BUS','OTHER'].map(t => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
-            <input type="text" placeholder="Car Model (e.g. Toyota Axio) *" value={form.car_model}
+            <input type="text" placeholder="Car Model (e.g. Toyota Axio, Vitz, Corolla) *" value={form.car_model}
               onChange={e => setField('car_model', e.target.value)} className={inputCls} disabled={submitting} />
           </div>
         </div>

@@ -120,7 +120,7 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
                 className="neu-button p-4 rounded-2xl flex justify-between items-center cursor-pointer">
                 <div>
                   <div className="font-bold text-slate-700 text-sm">{d.full_name}</div>
-                  <div className="text-xs text-slate-500 font-semibold mt-1">{d.car_type} • {d.location || 'Unknown'}</div>
+                  <div className="text-xs text-slate-500 font-semibold mt-1">{d.car_model} • {d.location || 'Unknown'}</div>
                   {d.status === 'DECLINED' && d.admin_note && (
                     <div className="text-xs text-red-500 font-bold mt-1 italic">"{d.admin_note}"</div>
                   )}
