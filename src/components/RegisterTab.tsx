@@ -31,12 +31,28 @@ export default function RegisterTab({ token, onSuccess }: RegisterTabProps) {
   }
 
   async function uploadDocument(f: File): Promise<string> {
-    const formData = new FormData()
-    formData.append('file', f)
-    
     api.setToken(token)
-    const data = await api.post('/upload/document', formData)
-    return data.url
+    
+    // 1. Get signed URL from backend
+    const { signedUrl, publicUrl } = await api.post('/upload/document/presigned', {
+      filename: f.name
+    })
+
+    // 2. Upload directly to Supabase
+    const res = await fetch(signedUrl, {
+      method: 'PUT',
+      body: f,
+      headers: {
+        'Content-Type': f.type || 'application/octet-stream',
+      }
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to upload file to storage')
+    }
+
+    // 3. Return the public URL that the backend pre-calculated
+    return publicUrl
   }
 
   async function handleSubmit(e: React.FormEvent) {
