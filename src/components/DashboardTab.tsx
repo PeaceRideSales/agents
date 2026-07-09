@@ -47,9 +47,9 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
   const monthlyPct = monthlyTarget > 0 ? Math.min((thisMonth / monthlyTarget) * 100, 100) : 0;
 
   // SVG calculations
-  const radiusDaily = 135;
-  const radiusWeekly = 150;
-  const radiusMonthly = 165;
+  const radiusDaily = 142;
+  const radiusWeekly = 158;
+  const radiusMonthly = 174;
   const circDaily = 2 * Math.PI * radiusDaily;
   const circWeekly = 2 * Math.PI * radiusWeekly;
   const circMonthly = 2 * Math.PI * radiusMonthly;
@@ -63,10 +63,19 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
 
       {/* Impressive Neumorphic Circular Dashboard Widget with Target Rings */}
       <div className="flex justify-center my-12">
-        <div className="relative w-80 h-80 flex items-center justify-center">
+        <div className="relative w-[360px] h-[360px] flex items-center justify-center">
           
           {/* Concentric SVG Target Rings */}
           <svg className="absolute inset-0 w-full h-full transform -rotate-90 pointer-events-none drop-shadow-md" viewBox="0 0 360 360">
+            <defs>
+              <filter id="watery" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="noise">
+                  <animate attributeName="baseFrequency" values="0.04; 0.06; 0.04" dur="5s" repeatCount="indefinite" />
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
+
             {/* Background tracks (Neumorphic inset effect via dark stroke with opacity) */}
             <circle cx="180" cy="180" r={radiusMonthly} stroke="#a3b1c6" strokeWidth="8" fill="none" opacity="0.3" />
             <circle cx="180" cy="180" r={radiusWeekly} stroke="#a3b1c6" strokeWidth="8" fill="none" opacity="0.3" />
@@ -84,9 +93,9 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
                 className="transition-all duration-1000 ease-out" />
             )}
             {dailyTarget > 0 && (
-              <circle cx="180" cy="180" r={radiusDaily} stroke="#10b981" strokeWidth="8" fill="none" strokeLinecap="round"
+              <circle cx="180" cy="180" r={radiusDaily} stroke="#06b6d4" strokeWidth="8" fill="none" strokeLinecap="round"
                 strokeDasharray={circDaily} strokeDashoffset={circDaily - (dailyPct / 100) * circDaily}
-                className="transition-all duration-1000 ease-out" />
+                className="transition-all duration-1000 ease-out drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" filter="url(#watery)" />
             )}
           </svg>
 
@@ -136,10 +145,10 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
       
       {/* Target Legend */}
       {(dailyTarget > 0 || weeklyTarget > 0 || monthlyTarget > 0) && (
-        <div className="flex justify-center gap-4 px-2">
+        <div className="flex justify-center gap-4 px-2 mt-4">
           {dailyTarget > 0 && (
-            <div className="text-center bg-emerald-50/50 rounded-xl py-2 px-3 flex-1 border border-emerald-100">
-              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-0.5">Daily</p>
+            <div className="text-center bg-cyan-50/50 rounded-xl py-2 px-3 flex-1 border border-cyan-100">
+              <p className="text-[10px] font-black text-cyan-600 uppercase tracking-widest mb-0.5">Daily</p>
               <p className="text-xs font-bold text-slate-700">{thisDay}/{dailyTarget}</p>
             </div>
           )}
