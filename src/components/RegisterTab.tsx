@@ -5,13 +5,12 @@ import { api } from '../api'
 
 
 interface RegisterTabProps {
-  token: string
   onSuccess: () => void
 }
 
 const tg = window.Telegram?.WebApp
 
-export default function RegisterTab({ token, onSuccess }: RegisterTabProps) {
+export default function RegisterTab({ onSuccess }: RegisterTabProps) {
   const [form, setForm] = useState({
     full_name: '', phone: '', license_plate: '',
     car_model: '',

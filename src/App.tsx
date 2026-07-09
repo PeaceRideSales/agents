@@ -27,7 +27,6 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(false)
   const { t, language, setLanguage } = useLanguage()
   const [agent, setAgent] = useState<Agent | null>(null)
-  const [token, setToken] = useState('')
   const [error, setError] = useState('')
 
   // Configure Telegram Theme
@@ -55,8 +54,6 @@ export default function App() {
     try {
       const data = await api.post('/auth/telegram', { telegram_init_data: initData })
       
-      setToken(data.token)
-      api.setToken(data.token) // Set global token for future requests
       setAgent(data.agent)
       
       const startParam = tg?.initDataUnsafe?.start_param
@@ -147,7 +144,7 @@ export default function App() {
       <div className="flex-1 overflow-y-auto p-4 max-w-md mx-auto w-full">
         {activeTab === 'dashboard' && <DashboardTab />}
         {activeTab === 'register' && (
-          <RegisterTab token={token} onSuccess={() => setScreen('success')} />
+          <RegisterTab onSuccess={() => setScreen('success')} />
         )}
         {activeTab === 'wallet' && <WalletTab agent={agent} onUpdateAgent={init} />}
         {activeTab === 'leaderboard' && <LeaderboardTab />}
