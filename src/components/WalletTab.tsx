@@ -44,9 +44,9 @@ export default function WalletTab({ stats, agent, drivers, onUpdateAgent }: Wall
       const driversThatDay = (drivers || []).filter(drv => {
         const time = new Date(drv.created_at).getTime()
         return drv.status === 'VERIFIED' && time >= startOfDay && time <= endOfDay
-      }).length
+      })
 
-      const earned = driversThatDay * (stats?.pricePerDriver || 0)
+      const earned = driversThatDay.reduce((sum, drv) => sum + Number(drv.payout_amount || 0), 0)
       total7Days += earned
 
       data.push({
@@ -59,7 +59,7 @@ export default function WalletTab({ stats, agent, drivers, onUpdateAgent }: Wall
     const projectedMonthly = (total7Days / 7) * 30
 
     return { chartData: data, projectedMonthly }
-  }, [drivers, stats?.pricePerDriver])
+  }, [drivers])
 
   async function handleSave() {
     setSaving(true)
@@ -108,11 +108,11 @@ export default function WalletTab({ stats, agent, drivers, onUpdateAgent }: Wall
           ${stats?.earnings?.toFixed(2) || '0.00'}
         </div>
         <div className="flex gap-4 relative z-10">
-          <div className="bg-white/20 px-3 py-1.5 rounded-lg text-sm font-semibold backdrop-blur-sm">
-            {stats?.verified || 0} {t('wallet.verified_drivers')}
+          <div className="bg-white/20 px-3 py-1.5 rounded-lg text-sm font-semibold backdrop-blur-sm flex items-center gap-1">
+            <DollarSign className="w-4 h-4" />{stats?.priceLatest || 150} <span className="text-[10px] opacity-80 uppercase">Latest/EV</span>
           </div>
           <div className="bg-white/20 px-3 py-1.5 rounded-lg text-sm font-semibold backdrop-blur-sm flex items-center gap-1">
-            <DollarSign className="w-4 h-4" />{(stats?.pricePerDriver || 0).toFixed(2)} / driver
+            <DollarSign className="w-4 h-4" />{stats?.priceOlder || 120} <span className="text-[10px] opacity-80 uppercase">Older</span>
           </div>
         </div>
       </div>

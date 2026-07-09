@@ -25,7 +25,9 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
     </div>
   )
 
-  const hasEarnings = (stats?.pricePerDriver ?? 0) > 0
+  const hasEarnings = stats?.hasEarnings
+  const priceLatest = stats?.priceLatest ?? 150
+  const priceOlder = stats?.priceOlder ?? 120
   const verified = stats?.verified ?? 0
   const pending = stats?.pending ?? 0
   const declined = stats?.declined ?? 0
@@ -96,9 +98,12 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
           </div>
         </div>
         {hasEarnings && (
-          <p className="text-xs text-slate-500 font-semibold text-center mt-2">
-            Earnings paid for <span className="text-emerald-600 font-bold">{verified} {t('dashboard.verified')}</span> drivers × ${stats?.pricePerDriver?.toFixed(2)}/driver
-          </p>
+          <div className="bg-emerald-50 text-emerald-800 p-3 rounded-xl border border-emerald-100 text-xs font-semibold text-center mt-2 space-y-1">
+            <p>Total earnings: <span className="font-black text-emerald-600 text-sm">{stats?.earnings?.toFixed(2)} Birr</span></p>
+            <p className="text-[10px] text-emerald-600/80 uppercase font-bold tracking-wider">
+              {priceLatest} Birr (Latest/EV) • {priceOlder} Birr (Older)
+            </p>
+          </div>
         )}
       </div>
 
@@ -121,6 +126,9 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
                 <div>
                   <div className="font-bold text-slate-700 text-sm">{d.full_name}</div>
                   <div className="text-xs text-slate-500 font-semibold mt-1">{d.car_model} • {d.location || 'Unknown'}</div>
+                  {d.status === 'VERIFIED' && d.payout_amount && (
+                    <div className="text-xs text-emerald-600 font-bold mt-1">Paid: {d.payout_amount} Birr</div>
+                  )}
                   {d.status === 'DECLINED' && d.admin_note && (
                     <div className="text-xs text-red-500 font-bold mt-1 italic">"{d.admin_note}"</div>
                   )}
