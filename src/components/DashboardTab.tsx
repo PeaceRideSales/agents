@@ -33,6 +33,27 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
   const declined = stats?.declined ?? 0
   const total = stats?.total ?? 0
 
+  // Targets
+  const thisDay = stats?.thisDay ?? 0
+  const thisWeek = stats?.thisWeek ?? 0
+  const thisMonth = stats?.thisMonth ?? 0
+  
+  const dailyTarget = stats?.dailyTarget || 0
+  const weeklyTarget = stats?.weeklyTarget || 0
+  const monthlyTarget = stats?.monthlyTarget || 0
+
+  const dailyPct = dailyTarget > 0 ? Math.min((thisDay / dailyTarget) * 100, 100) : 0;
+  const weeklyPct = weeklyTarget > 0 ? Math.min((thisWeek / weeklyTarget) * 100, 100) : 0;
+  const monthlyPct = monthlyTarget > 0 ? Math.min((thisMonth / monthlyTarget) * 100, 100) : 0;
+
+  // SVG calculations
+  const radiusDaily = 135;
+  const radiusWeekly = 150;
+  const radiusMonthly = 165;
+  const circDaily = 2 * Math.PI * radiusDaily;
+  const circWeekly = 2 * Math.PI * radiusWeekly;
+  const circMonthly = 2 * Math.PI * radiusMonthly;
+
   return (
     <div className="space-y-8 pb-4 pt-2">
       <div className="text-center">
@@ -40,42 +61,102 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
         <p className="text-sm text-slate-500">Here is your performance</p>
       </div>
 
-      {/* Impressive Neumorphic Circular Dashboard Widget */}
-      <div className="flex justify-center my-8">
-        <div className="relative w-64 h-64 neu-circle flex flex-col items-center justify-center border-4 border-transparent">
+      {/* Impressive Neumorphic Circular Dashboard Widget with Target Rings */}
+      <div className="flex justify-center my-12">
+        <div className="relative w-80 h-80 flex items-center justify-center">
           
-          {/* Logo inset ring */}
-          <div className="absolute inset-2 rounded-full neu-pressed pointer-events-none"></div>
+          {/* Concentric SVG Target Rings */}
+          <svg className="absolute inset-0 w-full h-full transform -rotate-90 pointer-events-none drop-shadow-md" viewBox="0 0 360 360">
+            {/* Background tracks (Neumorphic inset effect via dark stroke with opacity) */}
+            <circle cx="180" cy="180" r={radiusMonthly} stroke="#a3b1c6" strokeWidth="8" fill="none" opacity="0.3" />
+            <circle cx="180" cy="180" r={radiusWeekly} stroke="#a3b1c6" strokeWidth="8" fill="none" opacity="0.3" />
+            <circle cx="180" cy="180" r={radiusDaily} stroke="#a3b1c6" strokeWidth="8" fill="none" opacity="0.3" />
 
-          {/* Logo at the top of the circle */}
-          <div className="absolute top-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain filter brightness-0 invert" onError={e => (e.currentTarget.style.display = 'none')} />
+            {/* Progress tracks */}
+            {monthlyTarget > 0 && (
+              <circle cx="180" cy="180" r={radiusMonthly} stroke="#8b5cf6" strokeWidth="8" fill="none" strokeLinecap="round"
+                strokeDasharray={circMonthly} strokeDashoffset={circMonthly - (monthlyPct / 100) * circMonthly}
+                className="transition-all duration-1000 ease-out" />
+            )}
+            {weeklyTarget > 0 && (
+              <circle cx="180" cy="180" r={radiusWeekly} stroke="#3b82f6" strokeWidth="8" fill="none" strokeLinecap="round"
+                strokeDasharray={circWeekly} strokeDashoffset={circWeekly - (weeklyPct / 100) * circWeekly}
+                className="transition-all duration-1000 ease-out" />
+            )}
+            {dailyTarget > 0 && (
+              <circle cx="180" cy="180" r={radiusDaily} stroke="#10b981" strokeWidth="8" fill="none" strokeLinecap="round"
+                strokeDasharray={circDaily} strokeDashoffset={circDaily - (dailyPct / 100) * circDaily}
+                className="transition-all duration-1000 ease-out" />
+            )}
+          </svg>
+
+          {/* Central Neumorphic Circle */}
+          <div className="relative w-64 h-64 neu-circle flex flex-col items-center justify-center border-4 border-transparent z-10">
+            {/* Logo inset ring */}
+            <div className="absolute inset-2 rounded-full neu-pressed pointer-events-none"></div>
+
+            {/* Logo at the top of the circle */}
+            <div className="absolute top-4">
+              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain filter brightness-0 invert" onError={e => (e.currentTarget.style.display = 'none')} />
+              </div>
             </div>
-          </div>
 
-          <div className="text-center z-10 mt-8">
-            <span className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('dashboard.drivers_registered')}</span>
-            <span className="block text-6xl font-black text-slate-700 tracking-tighter leading-none">
-              {total}
-            </span>
-          </div>
+            <div className="text-center z-10 mt-8">
+              <span className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('dashboard.drivers_registered')}</span>
+              <span className="block text-6xl font-black text-slate-700 tracking-tighter leading-none">
+                {total}
+              </span>
+            </div>
 
-          {/* Bottom badge inside the circle */}
-          {hasEarnings && (
-            <div className="absolute bottom-6 flex items-center gap-1.5 neu-pressed text-emerald-600 px-5 py-2 rounded-full text-sm font-black">
-              <DollarSign className="w-4 h-4" />
-              {stats?.earnings?.toFixed(2) || '0.00'}
+            {/* Bottom badge inside the circle */}
+            {hasEarnings && (
+              <div className="absolute bottom-6 flex items-center gap-1.5 neu-pressed text-emerald-600 px-5 py-2 rounded-full text-sm font-black">
+                <DollarSign className="w-4 h-4" />
+                {stats?.earnings?.toFixed(2) || '0.00'}
+              </div>
+            )}
+            {!hasEarnings && (
+              <div className="absolute bottom-6 flex items-center gap-1.5 neu-pressed text-blue-600 px-5 py-2 rounded-full text-sm font-black">
+                <Car className="w-4 h-4" />
+                {stats?.thisMonth || 0} this month
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Target Setup Prompt if no targets set */}
+      {!dailyTarget && !weeklyTarget && !monthlyTarget && (
+        <div className="neu-card p-4 mx-2 text-center text-sm font-bold text-slate-500 flex flex-col gap-2 rounded-2xl border border-blue-100">
+          <p>You haven't set any registration targets yet.</p>
+          <p className="text-[10px] uppercase text-blue-500">Go to Wallet &gt; Target Goals to set them up!</p>
+        </div>
+      )}
+      
+      {/* Target Legend */}
+      {(dailyTarget > 0 || weeklyTarget > 0 || monthlyTarget > 0) && (
+        <div className="flex justify-center gap-4 px-2">
+          {dailyTarget > 0 && (
+            <div className="text-center bg-emerald-50/50 rounded-xl py-2 px-3 flex-1 border border-emerald-100">
+              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-0.5">Daily</p>
+              <p className="text-xs font-bold text-slate-700">{thisDay}/{dailyTarget}</p>
             </div>
           )}
-          {!hasEarnings && (
-            <div className="absolute bottom-6 flex items-center gap-1.5 neu-pressed text-blue-600 px-5 py-2 rounded-full text-sm font-black">
-              <Car className="w-4 h-4" />
-              {stats?.thisMonth || 0} this month
+          {weeklyTarget > 0 && (
+            <div className="text-center bg-blue-50/50 rounded-xl py-2 px-3 flex-1 border border-blue-100">
+              <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-0.5">Weekly</p>
+              <p className="text-xs font-bold text-slate-700">{thisWeek}/{weeklyTarget}</p>
+            </div>
+          )}
+          {monthlyTarget > 0 && (
+            <div className="text-center bg-purple-50/50 rounded-xl py-2 px-3 flex-1 border border-purple-100">
+              <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-0.5">Monthly</p>
+              <p className="text-xs font-bold text-slate-700">{thisMonth}/{monthlyTarget}</p>
             </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Verification breakdown */}
       <div className="neu-card p-5 space-y-4">

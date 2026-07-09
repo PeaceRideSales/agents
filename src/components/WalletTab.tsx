@@ -20,6 +20,14 @@ export default function WalletTab({ stats, agent, drivers, onUpdateAgent }: Wall
   const [details, setDetails] = useState(agent?.payment_details || '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  
+  // Targets State
+  const [dailyTarget, setDailyTarget] = useState(stats?.dailyTarget || '')
+  const [weeklyTarget, setWeeklyTarget] = useState(stats?.weeklyTarget || '')
+  const [monthlyTarget, setMonthlyTarget] = useState(stats?.monthlyTarget || '')
+  const [savingTargets, setSavingTargets] = useState(false)
+  const [savedTargets, setSavedTargets] = useState(false)
+
   const { t } = useLanguage()
 
   // Determine Agent Tier
@@ -77,6 +85,26 @@ export default function WalletTab({ stats, agent, drivers, onUpdateAgent }: Wall
       tg?.HapticFeedback?.notificationOccurred('error')
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleSaveTargets() {
+    setSavingTargets(true)
+    try {
+      await api.patch('/agents/me/targets', { 
+        daily_target: dailyTarget, 
+        weekly_target: weeklyTarget,
+        monthly_target: monthlyTarget
+      })
+      tg?.HapticFeedback?.notificationOccurred('success')
+      setSavedTargets(true)
+      if (onUpdateAgent) onUpdateAgent()
+      setTimeout(() => setSavedTargets(false), 3000)
+    } catch (error) {
+      console.error('Failed to save targets:', error)
+      tg?.HapticFeedback?.notificationOccurred('error')
+    } finally {
+      setSavingTargets(false)
     }
   }
 
@@ -228,6 +256,73 @@ export default function WalletTab({ stats, agent, drivers, onUpdateAgent }: Wall
               <><Save className="w-5 h-5" /> {t('wallet.saved')}</>
             ) : (
               <><Save className="w-5 h-5" /> {t('wallet.save_details')}</>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Target Goals Settings */}
+      <div className="neu-card rounded-2xl overflow-hidden pb-4">
+        <div className="p-5 flex items-center gap-3">
+          <div className="w-10 h-10 neu-circle flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
+          </div>
+          <h3 className="font-black text-slate-700">Target Goals</h3>
+        </div>
+        <div className="px-5 space-y-5">
+          <p className="text-xs font-bold text-slate-500">
+            Set your registration targets. These will appear as progress rings on your Dashboard.
+          </p>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2 text-center">Daily</label>
+              <input 
+                type="number" 
+                value={dailyTarget}
+                onChange={e => setDailyTarget(e.target.value)}
+                placeholder="0"
+                className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-xl block p-3 text-center outline-none border-none placeholder-slate-400"
+                disabled={savingTargets}
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2 text-center">Weekly</label>
+              <input 
+                type="number" 
+                value={weeklyTarget}
+                onChange={e => setWeeklyTarget(e.target.value)}
+                placeholder="0"
+                className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-xl block p-3 text-center outline-none border-none placeholder-slate-400"
+                disabled={savingTargets}
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black text-purple-500 uppercase tracking-widest mb-2 text-center">Monthly</label>
+              <input 
+                type="number" 
+                value={monthlyTarget}
+                onChange={e => setMonthlyTarget(e.target.value)}
+                placeholder="0"
+                className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-xl block p-3 text-center outline-none border-none placeholder-slate-400"
+                disabled={savingTargets}
+              />
+            </div>
+          </div>
+
+          <button 
+            onClick={handleSaveTargets}
+            disabled={savingTargets}
+            className={`w-full flex justify-center items-center gap-2 font-black rounded-xl px-4 py-4 text-white transition-colors ${
+              savedTargets ? 'bg-emerald-500 shadow-[0_10px_20px_rgba(16,185,129,0.3)]' : 'bg-slate-700 shadow-[0_10px_20px_rgba(51,65,85,0.3)] hover:bg-slate-800 disabled:opacity-50 disabled:shadow-none'
+            }`}
+          >
+            {savingTargets ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : savedTargets ? (
+              <><Save className="w-5 h-5" /> Saved!</>
+            ) : (
+              <><Save className="w-5 h-5" /> Save Targets</>
             )}
           </button>
         </div>
