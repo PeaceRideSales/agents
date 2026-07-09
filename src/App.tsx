@@ -29,9 +29,6 @@ export default function App() {
   const [agent, setAgent] = useState<Agent | null>(null)
   const [token, setToken] = useState('')
   const [error, setError] = useState('')
-  const [stats, setStats] = useState<any>(null)
-  const [myDrivers, setMyDrivers] = useState<any[]>([])
-  const [loadingStats, setLoadingStats] = useState(false)
 
   // Configure Telegram Theme
   useEffect(() => {
@@ -79,29 +76,11 @@ export default function App() {
     }
   }, [applyReferralCode])
 
-  const fetchMyDrivers = useCallback(async () => {
-    if (!token) return
-    setLoadingStats(true)
-    try {
-      const data = await api.get('/drivers/me')
-      setStats(data.stats)
-      setMyDrivers(data.drivers || [])
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setLoadingStats(false)
-    }
-  }, [token])
 
   useEffect(() => {
     init()
   }, [init])
 
-  useEffect(() => {
-    if (screen === 'main' && activeTab === 'dashboard') {
-      fetchMyDrivers()
-    }
-  }, [screen, activeTab, fetchMyDrivers])
 
   useEffect(() => {
     if (screen === 'main' && !localStorage.getItem('agent_onboarding_v2')) {
@@ -166,13 +145,11 @@ export default function App() {
 
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto p-4 max-w-md mx-auto w-full">
-        {activeTab === 'dashboard' && (
-          <DashboardTab stats={stats} drivers={myDrivers} loading={loadingStats} />
-        )}
+        {activeTab === 'dashboard' && <DashboardTab />}
         {activeTab === 'register' && (
           <RegisterTab token={token} onSuccess={() => setScreen('success')} />
         )}
-        {activeTab === 'wallet' && <WalletTab stats={stats} agent={agent} drivers={myDrivers} onUpdateAgent={init} />}
+        {activeTab === 'wallet' && <WalletTab agent={agent} onUpdateAgent={init} />}
         {activeTab === 'leaderboard' && <LeaderboardTab />}
       </div>
 

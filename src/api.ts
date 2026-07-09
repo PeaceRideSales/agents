@@ -7,6 +7,10 @@ class ApiClient {
     this.token = token;
   }
 
+  getToken() {
+    return this.token;
+  }
+
   async fetch(endpoint: string, options: RequestInit = {}) {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

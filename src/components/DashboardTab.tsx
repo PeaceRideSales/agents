@@ -2,14 +2,13 @@ import { useState } from 'react'
 import Modal from './Modal'
 import { CheckCircle, Clock, XCircle, Car, DollarSign } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
+import { useMyDrivers } from '../hooks/useDrivers'
+import { api } from '../api'
 
-interface DashboardTabProps {
-  stats: any
-  drivers: any[]
-  loading: boolean
-}
-
-export default function DashboardTab({ stats, drivers, loading }: DashboardTabProps) {
+export default function DashboardTab() {
+  const { data, isLoading: loading } = useMyDrivers(api.getToken() || '')
+  const stats = data?.stats
+  const drivers = data?.drivers || []
   const [selected, setSelected] = useState<any | null>(null)
   const { t } = useLanguage()
 

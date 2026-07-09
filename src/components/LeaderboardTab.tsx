@@ -1,28 +1,12 @@
-import { useState, useEffect } from 'react'
 import { Trophy, Star } from 'lucide-react'
 import { useLanguage } from '../hooks/useLanguage'
-import { api } from '../api'
+import { useLeaderboard } from '../hooks/useLeaderboard'
 
 export default function LeaderboardTab() {
-  const [leaders, setLeaders] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: leaders = [], isLoading } = useLeaderboard()
   const { t } = useLanguage()
 
-  useEffect(() => {
-    async function fetchLeaderboard() {
-      try {
-        const data = await api.get('/agents/leaderboard')
-        setLeaders(data)
-      } catch (e) { 
-        console.error('Failed to fetch leaderboard:', e)
-      } finally { 
-        setLoading(false) 
-      }
-    }
-    fetchLeaderboard()
-  }, [])
-
-  if (loading) return (
+  if (isLoading) return (
     <div className="space-y-6 animate-pulse px-2 pb-8 pt-4">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-12 h-12 bg-slate-200/50 rounded-full" />
@@ -58,7 +42,7 @@ export default function LeaderboardTab() {
 
       {/* Leaderboard List */}
       <div className="neu-card rounded-3xl overflow-hidden py-4 px-4 space-y-4">
-        {leaders.map((leader, index) => {
+        {leaders.map((leader: any, index: number) => {
           const isTop3 = index < 3
           const rankColors = ['text-yellow-500', 'text-slate-400', 'text-amber-600']
           const badgeClass = rankColors[index] || 'text-slate-400'

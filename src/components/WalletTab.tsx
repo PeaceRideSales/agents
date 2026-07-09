@@ -3,19 +3,22 @@ import { Wallet, DollarSign, Save, CreditCard, ChevronRight, TrendingUp } from '
 import { useLanguage } from '../hooks/useLanguage'
 import { api } from '../api'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useMyDrivers } from '../hooks/useDrivers'
 
 const tg = window.Telegram?.WebApp
 
 const PAYMENT_METHODS = ['M-Pesa', 'Bank Transfer', 'Telebirr', 'CBE', 'PayPal', 'Cash']
 
 interface WalletTabProps {
-  stats: any
   agent: any
-  drivers: any[]
   onUpdateAgent?: () => void
 }
 
-export default function WalletTab({ stats, agent, drivers, onUpdateAgent }: WalletTabProps) {
+export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
+  const { data } = useMyDrivers(api.getToken() || '')
+  const stats = data?.stats
+  const drivers = data?.drivers || []
+
   const [method, setMethod] = useState(agent?.payment_method || '')
   const [details, setDetails] = useState(agent?.payment_details || '')
   const [saving, setSaving] = useState(false)
