@@ -23,8 +23,24 @@ export default function LeaderboardTab() {
   }, [])
 
   if (loading) return (
-    <div className="py-16 flex justify-center">
-      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+    <div className="space-y-6 animate-pulse px-2 pb-8 pt-4">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-12 h-12 bg-slate-200/50 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <div className="h-5 w-40 bg-slate-200/60 rounded" />
+          <div className="h-3 w-24 bg-slate-200/40 rounded" />
+        </div>
+      </div>
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="neu-card p-4 rounded-2xl flex items-center gap-4">
+          <div className="w-10 h-10 bg-slate-200/50 rounded-full shrink-0" />
+          <div className="flex-1">
+            <div className="h-4 w-28 bg-slate-200/60 rounded mb-2" />
+            <div className="h-3 w-16 bg-slate-200/40 rounded" />
+          </div>
+          <div className="w-12 h-8 bg-slate-200/50 rounded-xl" />
+        </div>
+      ))}
     </div>
   )
 

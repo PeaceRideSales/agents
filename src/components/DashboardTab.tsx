@@ -20,8 +20,23 @@ export default function DashboardTab({ stats, drivers, loading }: DashboardTabPr
   }
 
   if (loading) return (
-    <div className="py-16 flex justify-center">
-      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+    <div className="space-y-8 pb-4 pt-2 px-2 animate-pulse">
+      {/* Header Skeleton */}
+      <div className="flex flex-col items-center gap-2">
+        <div className="h-6 w-32 bg-slate-200/60 rounded-full" />
+        <div className="h-4 w-48 bg-slate-200/50 rounded-full" />
+      </div>
+      
+      {/* Circle Skeleton */}
+      <div className="flex justify-center my-12">
+        <div className="w-64 h-64 bg-slate-200/50 rounded-full border-4 border-white/50 shadow-inner" />
+      </div>
+
+      {/* Cards Skeleton */}
+      <div className="space-y-4">
+        <div className="h-28 w-full bg-slate-200/50 rounded-2xl" />
+        <div className="h-24 w-full bg-slate-200/50 rounded-2xl" />
+      </div>
     </div>
   )
 
