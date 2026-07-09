@@ -131,7 +131,7 @@ export default function App() {
     <div className="flex flex-col min-h-screen neu-bg pb-20">
 
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 bg-blue-600 sticky top-0 z-10 shadow-md">
+      <div className="flex items-center gap-3 px-5 py-4 bg-blue-600 sticky top-0 z-50 shadow-md">
         <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center shadow-inner">
           <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain filter brightness-0 invert"
             onError={e => (e.currentTarget.style.display = 'none')} />
@@ -177,22 +177,22 @@ export default function App() {
       </div>
 
       {/* Bottom Nav */}
-      <nav className="fixed bottom-0 w-full neu-bg pb-safe shadow-[0_-10px_20px_rgba(163,177,198,0.4)] z-20 border-t-2 border-white">
+      <nav className="fixed bottom-0 w-full bg-blue-600 pb-safe shadow-[0_-10px_20px_rgba(37,99,235,0.3)] z-50">
         <div className="flex justify-around items-center h-16 px-2">
-          <button onClick={() => { setActiveTab('dashboard'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'dashboard' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
-            <LayoutDashboard className={`w-5 h-5 ${activeTab === 'dashboard' ? 'fill-blue-50' : ''}`} />
+          <button onClick={() => { setActiveTab('dashboard'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'dashboard' ? 'text-white' : 'text-blue-200 hover:text-white'}`}>
+            <LayoutDashboard className={`w-5 h-5 ${activeTab === 'dashboard' ? 'fill-blue-400/30' : ''}`} />
             <span className="text-[10px] font-bold tracking-wide">{t('nav.home')}</span>
           </button>
-          <button onClick={() => { setActiveTab('register'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'register' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
-            <UserPlus className={`w-5 h-5 ${activeTab === 'register' ? 'fill-blue-50' : ''}`} />
+          <button onClick={() => { setActiveTab('register'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'register' ? 'text-white' : 'text-blue-200 hover:text-white'}`}>
+            <UserPlus className={`w-5 h-5 ${activeTab === 'register' ? 'fill-blue-400/30' : ''}`} />
             <span className="text-[10px] font-bold tracking-wide">{t('nav.register')}</span>
           </button>
-          <button onClick={() => { setActiveTab('wallet'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'wallet' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
-            <Wallet className={`w-5 h-5 ${activeTab === 'wallet' ? 'fill-blue-50' : ''}`} />
+          <button onClick={() => { setActiveTab('wallet'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'wallet' ? 'text-white' : 'text-blue-200 hover:text-white'}`}>
+            <Wallet className={`w-5 h-5 ${activeTab === 'wallet' ? 'fill-blue-400/30' : ''}`} />
             <span className="text-[10px] font-bold tracking-wide">{t('nav.wallet')}</span>
           </button>
-          <button onClick={() => { setActiveTab('leaderboard'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'leaderboard' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
-            <Trophy className={`w-5 h-5 ${activeTab === 'leaderboard' ? 'fill-blue-50' : ''}`} />
+          <button onClick={() => { setActiveTab('leaderboard'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'leaderboard' ? 'text-white' : 'text-blue-200 hover:text-white'}`}>
+            <Trophy className={`w-5 h-5 ${activeTab === 'leaderboard' ? 'fill-blue-400/30' : ''}`} />
             <span className="text-[10px] font-bold tracking-wide">{t('nav.top_agents')}</span>
           </button>
         </div>
