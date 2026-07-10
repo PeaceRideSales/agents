@@ -32,8 +32,6 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
   }
 
   async function uploadDocument(f: File): Promise<string> {
-    api.setToken(token)
-    
     // 1. Get signed URL from backend
     const { signedUrl, publicUrl } = await api.post('/upload/document/presigned', {
       filename: f.name
@@ -79,7 +77,6 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
         document_url = await uploadDocument(file)
       }
 
-      api.setToken(token)
       await api.post('/drivers', {
         ...form,
         document_url,
