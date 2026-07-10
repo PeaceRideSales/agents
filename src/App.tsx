@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import StatusScreens from './components/StatusScreens'
 import DashboardTab from './components/DashboardTab'
 import RegisterTab from './components/RegisterTab'
@@ -28,6 +29,25 @@ export default function App() {
   const { t, language, setLanguage } = useLanguage()
   const [agent, setAgent] = useState<Agent | null>(null)
   const [error, setError] = useState('')
+
+  const { data: agentData } = useQuery<Agent>({
+    queryKey: ['agent_me'],
+    queryFn: async () => await api.get('/agents/me'),
+    enabled: !!agent && agent.status === 'PENDING',
+    refetchInterval: (query: any) => {
+      const status = query.state?.data?.status || agent?.status;
+      return status === 'PENDING' ? 5000 : false;
+    }
+  })
+
+  useEffect(() => {
+    if (agentData && agentData.status !== agent?.status) {
+      setAgent(agentData)
+      if (agentData.status === 'APPROVED') setScreen('main')
+      else if (agentData.status === 'PENDING') setScreen('pending')
+      else { setError('Your account has been rejected.'); setScreen('pending') }
+    }
+  }, [agentData, agent?.status])
 
   // Configure Telegram Theme
   useEffect(() => {
