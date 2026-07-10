@@ -54,6 +54,9 @@ export default function App() {
     try {
       const data = await api.post('/auth/telegram', { telegram_init_data: initData })
       
+      if (data.token) {
+        api.setToken(data.token);
+      }
       setAgent(data.agent)
       
       const startParam = tg?.initDataUnsafe?.start_param
