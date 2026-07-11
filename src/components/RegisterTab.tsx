@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useLanguage } from '../hooks/useLanguage'
 import { api } from '../api'
+import { X, UploadCloud } from 'lucide-react'
 
 interface DocumentRequirement {
   id: string
   name: string
   required: boolean
 }
-
-
 
 interface RegisterTabProps {
   onSuccess: () => void
@@ -26,7 +25,7 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
   const [requirements, setRequirements] = useState<DocumentRequirement[]>([
     { id: 'primary_document', name: 'Primary Document', required: false }
   ])
-  const [files, setFiles] = useState<Record<string, File>>({})
+  const [files, setFiles] = useState<Record<string, File[]>>({})
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const { t } = useLanguage()
@@ -49,12 +48,10 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
   }
 
   async function uploadDocument(f: File): Promise<string> {
-    // 1. Get signed URL from backend
     const { signedUrl, publicUrl } = await api.post('/upload/document/presigned', {
       filename: f.name
     })
 
-    // 2. Upload directly to Supabase
     const res = await fetch(signedUrl, {
       method: 'PUT',
       body: f,
@@ -66,8 +63,6 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
     if (!res.ok) {
       throw new Error('Failed to upload file to storage')
     }
-
-    // 3. Return the public URL that the backend pre-calculated
     return publicUrl
   }
 
@@ -81,7 +76,7 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
       return
     }
 
-    const missingDocs = requirements.filter(r => r.required && !files[r.id])
+    const missingDocs = requirements.filter(r => r.required && (!files[r.id] || files[r.id].length === 0))
     if (missingDocs.length > 0) {
       setError(`Please upload: ${missingDocs.map(m => m.name).join(', ')}`)
       tg?.HapticFeedback?.notificationOccurred('error')
@@ -97,10 +92,18 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
     setSubmitting(true)
     try {
       const documents: any[] = []
-      for (const [type_id, file] of Object.entries(files)) {
-        const url = await uploadDocument(file)
-        documents.push({ type_id, url })
+      
+      const uploadPromises = []
+      for (const [type_id, fileArray] of Object.entries(files)) {
+        for (const file of fileArray) {
+           uploadPromises.push(
+             uploadDocument(file).then(url => ({ type_id, url }))
+           )
+        }
       }
+      
+      const uploadedDocs = await Promise.all(uploadPromises)
+      documents.push(...uploadedDocs)
 
       await api.post('/drivers', {
         ...form,
@@ -116,6 +119,22 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const handleFileChange = (reqId: string, newFiles: FileList | null) => {
+    if (!newFiles) return
+    const arr = Array.from(newFiles)
+    setFiles(prev => ({
+      ...prev,
+      [reqId]: [...(prev[reqId] || []), ...arr]
+    }))
+  }
+
+  const removeFile = (reqId: string, index: number) => {
+    setFiles(prev => ({
+      ...prev,
+      [reqId]: prev[reqId].filter((_, i) => i !== index)
+    }))
   }
 
   const inputCls = "w-full neu-pressed text-sm text-slate-700 font-bold placeholder-slate-400 outline-none p-4 rounded-xl transition-colors disabled:opacity-50"
@@ -158,21 +177,36 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
         <div className="neu-card rounded-3xl p-6">
           <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Documents</div>
           <div className="space-y-4">
-            {requirements.map(req => (
-              <label key={req.id} className={`flex items-center gap-4 p-4 neu-pressed rounded-xl cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                <div className="w-12 h-12 neu-circle flex items-center justify-center shrink-0">
-                  <span className="text-xl">{files[req.id] ? '✅' : '📎'}</span>
+            {requirements.map(req => {
+              const reqFiles = files[req.id] || []
+              return (
+                <div key={req.id} className={`p-4 neu-pressed rounded-xl ${submitting ? 'opacity-50' : ''}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-sm font-bold text-slate-700">{req.name}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{req.required ? t('register.required') : t('register.optional')}</p>
+                    </div>
+                    <label className="neu-circle w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-slate-50">
+                      <UploadCloud className="w-4 h-4 text-blue-600" />
+                      <input type="file" multiple accept="image/*,.pdf" className="hidden" disabled={submitting} onChange={e => handleFileChange(req.id, e.target.files)} />
+                    </label>
+                  </div>
+                  
+                  {reqFiles.length > 0 && (
+                    <div className="space-y-2 mt-3">
+                      {reqFiles.map((file, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-white/50 border border-slate-200 rounded-lg p-2 text-xs font-semibold text-slate-600 shadow-sm">
+                          <span className="truncate max-w-[200px]">{file.name}</span>
+                          <button type="button" disabled={submitting} onClick={() => removeFile(req.id, idx)} className="p-1 hover:bg-red-50 text-red-500 rounded">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div className="truncate flex-1">
-                  <p className="text-sm font-bold text-slate-700 truncate">{files[req.id] ? files[req.id].name : t('register.upload') + req.name}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{req.required ? t('register.required') : t('register.optional')}</p>
-                </div>
-                <input type="file" accept="image/*,.pdf" className="hidden" disabled={submitting} onChange={e => {
-                  const file = e.target.files?.[0]
-                  if (file) setFiles(f => ({ ...f, [req.id]: file }))
-                }} />
-              </label>
-            ))}
+              )
+            })}
           </div>
         </div>
 
