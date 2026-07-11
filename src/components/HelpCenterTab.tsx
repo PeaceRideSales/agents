@@ -6,7 +6,7 @@ import { useLanguage } from '../hooks/useLanguage'
 import { api } from '../api'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
-const SUPPORT_TELEGRAM_USERNAME = 'PeaceRideSupport'
+const SUPPORT_TELEGRAM_USERNAME = 'Zeki373'
 const tg = window.Telegram?.WebApp
 
 type MessageType = 'general' | 'appeal' | 'payment' | 'technical' | 'other'
@@ -218,8 +218,10 @@ export default function HelpCenterTab() {
             <MessageCircle className="w-5 h-5 text-blue-500" />
           </div>
           <div>
-            <p className="text-sm font-black text-slate-700">Telegram Fallback</p>
-            <p className="text-xs text-slate-500 font-semibold">Or reach out directly via our official bot</p>
+            <p className="text-sm font-black text-slate-700">Need immediate help?</p>
+            <p className="text-xs text-slate-500 font-semibold leading-relaxed mt-0.5">
+              If it's a system issue, please upload a screenshot and message <span className="font-bold text-blue-600">@Zeki373</span> directly on Telegram.
+            </p>
           </div>
         </div>
         <a
@@ -230,7 +232,7 @@ export default function HelpCenterTab() {
           onClick={() => tg?.HapticFeedback?.impactOccurred('light')}
         >
           <MessageCircle className="w-4 h-4" />
-          {t('help.support_btn') || 'Open Telegram'}
+          {t('help.support_btn') || 'Message @Zeki373'}
         </a>
       </div>
     </div>
