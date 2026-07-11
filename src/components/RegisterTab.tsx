@@ -27,6 +27,7 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
   ])
   const [files, setFiles] = useState<Record<string, File[]>>({})
   const [submitting, setSubmitting] = useState(false)
+  const [uploadPercent, setUploadPercent] = useState(0)
   const [error, setError] = useState('')
   const { t } = useLanguage()
 
@@ -47,22 +48,30 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
     return phoneRegex.test(phone.trim());
   }
 
-  async function uploadDocument(f: File): Promise<string> {
+  async function uploadDocument(f: File, onProgress: (loaded: number) => void): Promise<string> {
     const { signedUrl, publicUrl } = await api.post('/upload/document/presigned', {
       filename: f.name
     })
 
-    const res = await fetch(signedUrl, {
-      method: 'PUT',
-      body: f,
-      headers: {
-        'Content-Type': f.type || 'application/octet-stream',
+    await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open('PUT', signedUrl)
+      xhr.setRequestHeader('Content-Type', f.type || 'application/octet-stream')
+      
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          onProgress(e.loaded)
+        }
       }
+      
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.response)
+        else reject(new Error('Failed to upload file to storage'))
+      }
+      xhr.onerror = () => reject(new Error('Failed to upload file to storage'))
+      xhr.send(f)
     })
 
-    if (!res.ok) {
-      throw new Error('Failed to upload file to storage')
-    }
     return publicUrl
   }
 
@@ -93,17 +102,28 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
     try {
       const documents: any[] = []
       
+      const totalBytes = Object.values(files).flat().reduce((acc, f) => acc + f.size, 0)
+      const loadedPerFile: Record<string, number> = {}
+
       const uploadPromises = []
       for (const [type_id, fileArray] of Object.entries(files)) {
         for (const file of fileArray) {
            uploadPromises.push(
-             uploadDocument(file).then(url => ({ type_id, url }))
+             uploadDocument(file, (loaded) => {
+                loadedPerFile[file.name] = loaded
+                if (totalBytes > 0) {
+                  const newTotal = Object.values(loadedPerFile).reduce((a, b) => a + b, 0)
+                  setUploadPercent(Math.round((newTotal / totalBytes) * 100))
+                }
+             }).then(url => ({ type_id, url }))
            )
         }
       }
       
       const uploadedDocs = await Promise.all(uploadPromises)
       documents.push(...uploadedDocs)
+
+      setUploadPercent(100) // done uploading
 
       await api.post('/drivers', {
         ...form,
@@ -211,8 +231,13 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
         </div>
 
         <button type="submit" disabled={submitting}
-          className="w-full p-5 rounded-2xl font-black bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-colors mt-4">
-          {submitting ? t('register.submitting') : t('register.submit')}
+          className="w-full p-5 rounded-2xl font-black bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-colors mt-4 relative overflow-hidden">
+          {submitting && uploadPercent > 0 && uploadPercent < 100 && (
+            <div className="absolute left-0 top-0 bottom-0 bg-blue-800 transition-all duration-300 opacity-30" style={{ width: `${uploadPercent}%` }} />
+          )}
+          <span className="relative z-10">
+            {submitting ? (uploadPercent > 0 && uploadPercent < 100 ? `Uploading... ${uploadPercent}%` : t('register.submitting')) : t('register.submit')}
+          </span>
         </button>
       </form>
     </div>
