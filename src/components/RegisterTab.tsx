@@ -32,8 +32,8 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
 
   useEffect(() => {
     api.get('/settings').then(res => {
-      if (res.data?.driver_document_requirements) {
-        setRequirements(res.data.driver_document_requirements)
+      if (res.driver_document_requirements) {
+        setRequirements(res.driver_document_requirements)
       }
     }).catch(console.error)
   }, [])

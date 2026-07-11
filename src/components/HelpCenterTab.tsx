@@ -55,16 +55,17 @@ export default function HelpCenterTab() {
       let document_url = ''
       if (file) {
         // Upload file
-        const { url, fields } = await api.post('/upload/document/presigned', {
+        const { signedUrl, publicUrl } = await api.post('/upload/document/presigned', {
           filename: `support_${Date.now()}_${file.name}`,
           contentType: file.type
         })
-        const formData = new FormData()
-        Object.entries(fields).forEach(([k, v]) => formData.append(k, v as string))
-        formData.append('file', file)
-        const uploadRes = await fetch(url, { method: 'POST', body: formData })
+        const uploadRes = await fetch(signedUrl, { 
+          method: 'PUT', 
+          headers: { 'Content-Type': file.type || 'application/octet-stream' },
+          body: file 
+        })
         if (!uploadRes.ok) throw new Error('File upload failed')
-        document_url = `${url}/${fields.key}`
+        document_url = publicUrl
       }
 
       await api.post('/support/message', {
