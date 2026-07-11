@@ -40,9 +40,11 @@ export interface Driver {
   car_model: string;
   location?: string;
   document_url?: string;
+  documents?: { type_id: string; url: string }[];
   status: DriverStatus;
   admin_note?: string;
   payout_amount?: number;
+  appealed?: boolean;
   registered_by: string;
   agent?: Agent; // Nested join
 }
@@ -62,6 +64,7 @@ export interface DashboardStats {
   dailyTarget: number;
   weeklyTarget: number;
   monthlyTarget: number;
+  globalVerified?: number;
 }
 
 export interface LeaderboardEntry {

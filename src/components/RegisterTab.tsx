@@ -1,6 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLanguage } from '../hooks/useLanguage'
 import { api } from '../api'
+
+interface DocumentRequirement {
+  id: string
+  name: string
+  required: boolean
+}
 
 
 
@@ -17,10 +23,21 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
     vehicle_category: 'OLDER',
     location: 'Addis Ababa'
   })
-  const [file, setFile] = useState<File | null>(null)
+  const [requirements, setRequirements] = useState<DocumentRequirement[]>([
+    { id: 'primary_document', name: 'Primary Document', required: false }
+  ])
+  const [files, setFiles] = useState<Record<string, File>>({})
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const { t } = useLanguage()
+
+  useEffect(() => {
+    api.get('/settings').then(res => {
+      if (res.data?.driver_document_requirements) {
+        setRequirements(res.data.driver_document_requirements)
+      }
+    }).catch(console.error)
+  }, [])
 
   function setField(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -64,6 +81,13 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
       return
     }
 
+    const missingDocs = requirements.filter(r => r.required && !files[r.id])
+    if (missingDocs.length > 0) {
+      setError(`Please upload: ${missingDocs.map(m => m.name).join(', ')}`)
+      tg?.HapticFeedback?.notificationOccurred('error')
+      return
+    }
+
     if (!validatePhone(form.phone)) {
       setError('Please enter a valid Ethiopian phone number (e.g. 0911234567 or +251911234567)')
       tg?.HapticFeedback?.notificationOccurred('error')
@@ -72,14 +96,15 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
 
     setSubmitting(true)
     try {
-      let document_url: string | undefined
-      if (file) {
-        document_url = await uploadDocument(file)
+      const documents: any[] = []
+      for (const [type_id, file] of Object.entries(files)) {
+        const url = await uploadDocument(file)
+        documents.push({ type_id, url })
       }
 
       await api.post('/drivers', {
         ...form,
-        document_url,
+        documents,
         telegram_init_data: tg?.initData || 'dev'
       })
 
@@ -131,17 +156,24 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
         </div>
 
         <div className="neu-card rounded-3xl p-6">
-          <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Document (Optional)</div>
-          <label className={`flex items-center gap-4 p-4 neu-pressed rounded-xl cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
-            <div className="w-12 h-12 neu-circle flex items-center justify-center shrink-0">
-              <span className="text-xl">📎</span>
-            </div>
-            <div className="truncate">
-              <p className="text-sm font-bold text-slate-700 truncate">{file ? file.name : 'Upload document'}</p>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Driver's license, ID, etc.</p>
-            </div>
-            <input type="file" accept="image/*,.pdf" className="hidden" disabled={submitting} onChange={e => setFile(e.target.files?.[0] || null)} />
-          </label>
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Documents</div>
+          <div className="space-y-4">
+            {requirements.map(req => (
+              <label key={req.id} className={`flex items-center gap-4 p-4 neu-pressed rounded-xl cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <div className="w-12 h-12 neu-circle flex items-center justify-center shrink-0">
+                  <span className="text-xl">{files[req.id] ? '✅' : '📎'}</span>
+                </div>
+                <div className="truncate flex-1">
+                  <p className="text-sm font-bold text-slate-700 truncate">{files[req.id] ? files[req.id].name : t('register.upload') + req.name}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{req.required ? t('register.required') : t('register.optional')}</p>
+                </div>
+                <input type="file" accept="image/*,.pdf" className="hidden" disabled={submitting} onChange={e => {
+                  const file = e.target.files?.[0]
+                  if (file) setFiles(f => ({ ...f, [req.id]: file }))
+                }} />
+              </label>
+            ))}
+          </div>
         </div>
 
         <button type="submit" disabled={submitting}

@@ -5,13 +5,14 @@ import DashboardTab from './components/DashboardTab'
 import RegisterTab from './components/RegisterTab'
 import WalletTab from './components/WalletTab'
 import LeaderboardTab from './components/LeaderboardTab'
+import HelpCenterTab from './components/HelpCenterTab'
 import OnboardingModal from './components/OnboardingModal'
-import { LayoutDashboard, UserPlus, Wallet, Trophy } from 'lucide-react'
+import { LayoutDashboard, UserPlus, Wallet, Trophy, LifeBuoy } from 'lucide-react'
 import { useLanguage } from './hooks/useLanguage'
 import { api } from './api'
 
 type Screen = 'loading' | 'pending' | 'main' | 'success'
-type Tab = 'dashboard' | 'register' | 'wallet' | 'leaderboard'
+type Tab = 'dashboard' | 'register' | 'wallet' | 'leaderboard' | 'help'
 
 interface Agent {
   id: string
@@ -114,6 +115,7 @@ export default function App() {
       <StatusScreens
         screen={screen}
         error={error}
+        agent={agent}
         onSuccessContinue={() => { setScreen('main'); setActiveTab('dashboard') }}
       />
     )
@@ -171,6 +173,7 @@ export default function App() {
         )}
         {activeTab === 'wallet' && <WalletTab agent={agent} onUpdateAgent={init} />}
         {activeTab === 'leaderboard' && <LeaderboardTab />}
+        {activeTab === 'help' && <HelpCenterTab />}
       </div>
 
       {/* Bottom Nav */}
@@ -191,6 +194,10 @@ export default function App() {
           <button onClick={() => { setActiveTab('leaderboard'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'leaderboard' ? 'text-white' : 'text-blue-200 hover:text-white'}`}>
             <Trophy className={`w-5 h-5 ${activeTab === 'leaderboard' ? 'fill-blue-400/30' : ''}`} />
             <span className="text-[10px] font-bold tracking-wide">{t('nav.top_agents')}</span>
+          </button>
+          <button onClick={() => { setActiveTab('help'); tg?.HapticFeedback?.selectionChanged() }} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${activeTab === 'help' ? 'text-white' : 'text-blue-200 hover:text-white'}`}>
+            <LifeBuoy className={`w-5 h-5 ${activeTab === 'help' ? 'fill-blue-400/30' : ''}`} />
+            <span className="text-[10px] font-bold tracking-wide">{t('nav.help')}</span>
           </button>
         </div>
       </nav>

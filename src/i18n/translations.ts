@@ -5,6 +5,7 @@ export const translations = {
     'nav.register': 'Register',
     'nav.wallet': 'Wallet',
     'nav.top_agents': 'Top Agents',
+    'nav.help': 'Help',
     'app.title': 'Peace Ride',
     'app.agent_portal': 'Agent Portal',
     'common.loading': 'Loading...',
@@ -12,6 +13,9 @@ export const translations = {
     'common.cancel': 'Cancel',
     'common.success': 'Success!',
     'common.error': 'Error',
+    'common.submit': 'Submit',
+    'common.submitting': 'Submitting...',
+    'common.close': 'Close',
 
     // Onboarding
     'onboarding.welcome': 'Welcome to Peace Ride',
@@ -34,7 +38,7 @@ export const translations = {
     'dashboard.payout_ready': 'Payout Ready',
     'dashboard.recent_drivers': 'Recent Drivers',
     'dashboard.no_drivers': 'No drivers registered yet.',
-    
+
     // Register
     'register.title': 'Register New Driver',
     'register.full_name': 'Full Name',
@@ -45,6 +49,10 @@ export const translations = {
     'register.submit': 'Register Driver',
     'register.submitting': 'Registering...',
     'register.success_msg': 'Driver registered successfully! They are now pending verification.',
+    'register.required': 'Required',
+    'register.optional': 'Optional',
+    'register.upload': 'Upload ',
+    'register.existing_document': 'Existing Document (Uploaded)',
 
     // Wallet
     'wallet.title': 'Your Wallet',
@@ -70,9 +78,58 @@ export const translations = {
     // Status Screens
     'status.pending_title': 'Account Pending',
     'status.pending_desc': "Your account is awaiting admin approval. You'll be notified once approved.",
+    'status.rejected_title': 'Account Rejected',
+    'status.rejected_desc': 'Your account application was reviewed and could not be approved at this time.',
+    'status.rejected_appeal_available': 'You have one opportunity to submit an appeal and correct any issues with your application.',
+    'status.rejected_no_appeal': 'Your appeal has already been submitted and is under review. Please contact support if you need further assistance.',
     'status.success_title': 'Driver Registered!',
     'status.success_desc': 'The driver has been successfully added to your roster.',
-    'status.view_dashboard': 'View Dashboard'
+    'status.view_dashboard': 'View Dashboard',
+
+    // Appeal
+    'appeal.title': 'Edit & Appeal',
+    'appeal.subtitle': 'Correct the information below and explain why this driver should be reconsidered.',
+    'appeal.reason_label': 'Appeal Reason *',
+    'appeal.reason_placeholder': 'Clearly explain why this driver should be reconsidered. Mention any corrections you have made...',
+    'appeal.document_label': 'Upload Updated Document (Optional)',
+    'appeal.document_replace': 'Replace Document',
+    'appeal.submit': 'Submit Appeal',
+    'appeal.submitting': 'Submitting Appeal...',
+    'appeal.success': 'Your appeal has been submitted successfully. The admin will review it shortly.',
+    'appeal.already_appealed': 'This driver has already been appealed once. No further appeals are possible.',
+    'appeal.account_title': 'Appeal Your Account',
+    'appeal.account_subtitle': 'Explain why your account should be reconsidered. You may also upload a supporting document.',
+    'appeal.account_submit': 'Submit Account Appeal',
+
+    // Help Center
+    'help.title': 'Help Center',
+    'help.subtitle': 'We are here to assist you.',
+    'help.support_title': 'Telegram Support',
+    'help.support_desc': 'Contact our support team directly on Telegram for the fastest response.',
+    'help.support_btn': 'Open Support Chat',
+    'help.contact_title': 'Contact Information',
+    'help.contact_email': 'Email Support',
+    'help.contact_hours': 'Support Hours: Mon–Sat, 8am–8pm EAT',
+    'help.message_title': 'Send a Message',
+    'help.message_desc': 'Send us your issue, question, or feedback and we will get back to you as soon as possible.',
+    'help.message_type': 'Type of Request',
+    'help.message_type_general': 'General Question',
+    'help.message_type_appeal': 'Account or Driver Appeal',
+    'help.message_type_payment': 'Payment Issue',
+    'help.message_type_technical': 'Technical Problem',
+    'help.message_type_other': 'Other',
+    'help.message_body': 'Your Message *',
+    'help.message_placeholder': 'Describe your issue or question in detail...',
+    'help.send': 'Send Message',
+    'help.sending': 'Sending...',
+    'help.sent_success': 'Your message has been sent! Our team will respond shortly.',
+    'help.faq_title': 'Frequently Asked Questions',
+    'help.faq1_q': 'When will I receive my payment?',
+    'help.faq1_a': 'Payments are processed after a driver is verified. Your earnings accumulate and are paid out according to the payment schedule.',
+    'help.faq2_q': 'Why was my driver declined?',
+    'help.faq2_a': 'Drivers are declined if the information is incorrect, documents are missing or unclear, or the driver is already registered. You can appeal once per declined driver.',
+    'help.faq3_q': 'Can I register the same driver twice?',
+    'help.faq3_a': 'No. Each phone number and license plate must be unique in our system. Attempting to register a duplicate will be rejected.',
   },
   am: {
     // App Navigation & Common
@@ -80,6 +137,7 @@ export const translations = {
     'nav.register': 'ይመዝገቡ',
     'nav.wallet': 'ዋሌት',
     'nav.top_agents': 'ምርጥ ኤጀንቶች',
+    'nav.help': 'እርዳታ',
     'app.title': 'ፒስ ራይድ',
     'app.agent_portal': 'የኤጀንት ፖርታል',
     'common.loading': 'እየጫነ ነው...',
@@ -87,6 +145,9 @@ export const translations = {
     'common.cancel': 'ሰርዝ',
     'common.success': 'ተሳክቷል!',
     'common.error': 'ስህተት',
+    'common.submit': 'አስገባ',
+    'common.submitting': 'እያስገባ ነው...',
+    'common.close': 'ዝጋ',
 
     // Onboarding
     'onboarding.welcome': 'ወደ ፒስ ራይድ እንኳን በደህና መጡ',
@@ -109,7 +170,7 @@ export const translations = {
     'dashboard.payout_ready': 'ለክፍያ ዝግጁ',
     'dashboard.recent_drivers': 'የቅርብ ጊዜ አሽከርካሪዎች',
     'dashboard.no_drivers': 'እስካሁን ምንም አሽከርካሪ አልተመዘገበም።',
-    
+
     // Register
     'register.title': 'አዲስ አሽከርካሪ ይመዝግቡ',
     'register.full_name': 'ሙሉ ስም',
@@ -120,6 +181,10 @@ export const translations = {
     'register.submit': 'አሽከርካሪ መዝግብ',
     'register.submitting': 'እየመዘገበ ነው...',
     'register.success_msg': 'አሽከርካሪው በተሳካ ሁኔታ ተመዝግቧል! አሁን ማረጋገጫ በመጠባበቅ ላይ ናቸው።',
+    'register.required': 'አስፈላጊ',
+    'register.optional': 'አማራጭ',
+    'register.upload': 'ስቀል ',
+    'register.existing_document': 'ነባር ሰነድ (የተጫነ)',
 
     // Wallet
     'wallet.title': 'የእርስዎ ዋሌት',
@@ -143,11 +208,60 @@ export const translations = {
     'leaderboard.verified': 'የተረጋገጠ',
 
     // Status Screens
-    'status.pending_title': 'በመጠባበቅ ላይ',
-    'status.pending_desc': "የእርስዎ አካውንት በአድሚን እስኪረጋገጥ በመጠባበቅ ላይ ነው። እንደተረጋገጠ እናሳውቅዎታለን።",
+    'status.pending_title': 'አካውንት በመጠባበቅ ላይ',
+    'status.pending_desc': 'የእርስዎ አካውንት በአድሚን እስኪረጋገጥ በመጠባበቅ ላይ ነው። እንደተረጋገጠ እናሳውቅዎታለን።',
+    'status.rejected_title': 'አካውንት ውድቅ ሆኗል',
+    'status.rejected_desc': 'የእርስዎ የምዝገባ ማመልከቻ ተገምግሞ በአሁኑ ጊዜ ሊፀድቅ አልቻለም።',
+    'status.rejected_appeal_available': 'ማመልከቻዎን ለማስተካከልና ቅሬታ ለማቅረብ አንድ ጊዜ እድል አለዎት።',
+    'status.rejected_no_appeal': 'ቅሬታዎ ቀድሞ ተልኳል እናም በፍተሻ ላይ ነው። ለተጨማሪ እርዳታ ድጋፍ ያግኙ።',
     'status.success_title': 'አሽከርካሪው ተመዝግቧል!',
     'status.success_desc': 'አሽከርካሪው በተሳካ ሁኔታ ወደ እርስዎ ዝርዝር ውስጥ ታክሏል።',
-    'status.view_dashboard': 'ወደ መነሻ ይመለሱ'
+    'status.view_dashboard': 'ወደ መነሻ ይመለሱ',
+
+    // Appeal
+    'appeal.title': 'አርትዕ እና ቅሬታ አቅርቡ',
+    'appeal.subtitle': 'ከዚህ በታች ያለውን መረጃ ያስተካክሉ እና ይህ አሽከርካሪ ለምን እንደገና ሊታሰብ እንደሚገባ ያስረዱ።',
+    'appeal.reason_label': 'የቅሬታ ምክንያት *',
+    'appeal.reason_placeholder': 'ይህ አሽከርካሪ ለምን እንደገና ሊታሰብ እንደሚገባ በግልጽ ያስረዱ። ያደረጓቸውን ማሻሻያዎች ይጠቅሱ...',
+    'appeal.document_label': 'የተዘመነ ሰነድ ስቀሉ (አማራጭ)',
+    'appeal.document_replace': 'ሰነድ ይቀይሩ',
+    'appeal.submit': 'ቅሬታ አቅርቡ',
+    'appeal.submitting': 'ቅሬታ እየቀረበ ነው...',
+    'appeal.success': 'ቅሬታዎ በተሳካ ሁኔታ ቀርቧል። አድሚኑ በቅርቡ ይገመግመዋል።',
+    'appeal.already_appealed': 'ቅሬታ ቀደም ሲል ተልኳል። ሌሎች ቅሬታዎች አይቻሉም።',
+    'appeal.account_title': 'አካውንት ቅሬታ አቅርቡ',
+    'appeal.account_subtitle': 'አካውንትዎ ለምን እንደገና ሊታሰብ እንደሚገባ ያስረዱ። ድጋፍ ሰነድ መጫን ይችላሉ።',
+    'appeal.account_submit': 'የአካውንት ቅሬታ አቅርቡ',
+
+    // Help Center
+    'help.title': 'የእርዳታ ማዕከል',
+    'help.subtitle': 'ለማገዝ ዝግጁ ነን።',
+    'help.support_title': 'የቴሌግራም ድጋፍ',
+    'help.support_desc': 'ፈጣን ምላሽ ለማግኘት በቴሌግራም ቀጥታ የድጋፍ ቡድናችንን ያግኙ።',
+    'help.support_btn': 'የድጋፍ ቻት ክፈቱ',
+    'help.contact_title': 'የእውቂያ መረጃ',
+    'help.contact_email': 'በኢሜይል ድጋፍ',
+    'help.contact_hours': 'የድጋፍ ሰዓት፡ ሰኞ–ቅዳሜ፣ 8am–8pm EAT',
+    'help.message_title': 'መልዕክት ይላኩ',
+    'help.message_desc': 'ጥያቄዎን፣ ቅሬታዎን ወይም አስተያየትዎን ይላኩ፤ በቅርቡ ምላሽ እናደርጋለን።',
+    'help.message_type': 'የጥያቄ አይነት',
+    'help.message_type_general': 'አጠቃላይ ጥያቄ',
+    'help.message_type_appeal': 'የአካውንት ወይም የአሽከርካሪ ቅሬታ',
+    'help.message_type_payment': 'የክፍያ ጉዳይ',
+    'help.message_type_technical': 'ቴክኒካዊ ችግር',
+    'help.message_type_other': 'ሌላ',
+    'help.message_body': 'መልዕክትዎ *',
+    'help.message_placeholder': 'ጥያቄዎን ወይም ችግርዎን በዝርዝር ያስረዱ...',
+    'help.send': 'መልዕክት ላኩ',
+    'help.sending': 'እየላከ ነው...',
+    'help.sent_success': 'መልዕክትዎ ተልኳል! ቡድናችን በቅርቡ ምላሽ ይሰጣል።',
+    'help.faq_title': 'ተደጋጋሚ ጥያቄዎች',
+    'help.faq1_q': 'ክፍያዬን መቼ እቀበላለሁ?',
+    'help.faq1_a': 'ክፍያ አሽከርካሪ ከተረጋገጠ በኋላ ይፈጸማል። ገቢዎ ይከማቻል እናም እንደ የክፍያ መርሃ ግብሩ ይከፈልዎታለ።',
+    'help.faq2_q': 'አሽከርካሪዬ ለምን ውድቅ ሆነ?',
+    'help.faq2_a': 'አሽከርካሪዎች መረጃው ትክክለኛ ካልሆነ፣ ሰነዶች ከሌሉ ወይም ግልጽ ካልሆኑ፣ ወይም ቀደም ሲል ተመዝግቦ ከሆነ ውድቅ ይደረጋሉ። ለእያንዳንዱ ውድቅ ለሆነ አሽከርካሪ አንድ ጊዜ ቅሬታ ማቅረብ ይችላሉ።',
+    'help.faq3_q': 'አሽከርካሪን ሁለት ጊዜ መመዝገብ ይቻላል?',
+    'help.faq3_a': 'አይቻልም። እያንዳንዱ ስልክ ቁጥር እና የሰሌዳ ቁጥር በሲስተማችን ውስጥ ልዩ መሆን አለበት። ተደጋጋሚ ምዝገባ ሙከራ ውድቅ ይደረጋል።',
   }
 }
 

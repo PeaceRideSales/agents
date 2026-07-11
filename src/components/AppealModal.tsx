@@ -1,0 +1,300 @@
+import { useState, useEffect } from 'react'
+import { Paperclip, AlertCircle, CheckCircle } from 'lucide-react'
+import { useLanguage } from '../hooks/useLanguage'
+import { api } from '../api'
+import { useQueryClient } from '@tanstack/react-query'
+import Modal from './Modal'
+import type { Driver } from '../types'
+
+interface AppealModalProps {
+  driver: Driver | null
+  onClose: () => void
+}
+
+const tg = window.Telegram?.WebApp
+
+async function uploadDocument(f: File): Promise<string> {
+  const { signedUrl, publicUrl } = await api.post('/upload/document/presigned', {
+    filename: f.name,
+  })
+  const res = await fetch(signedUrl, {
+    method: 'PUT',
+    body: f,
+    headers: { 'Content-Type': f.type || 'application/octet-stream' },
+  })
+  if (!res.ok) throw new Error('Failed to upload document to storage')
+  return publicUrl
+}
+
+export default function AppealModal({ driver, onClose }: AppealModalProps) {
+  const { t } = useLanguage()
+  const queryClient = useQueryClient()
+
+  const [form, setForm] = useState({
+    full_name: driver?.full_name ?? '',
+    phone: driver?.phone ?? '',
+    car_model: driver?.car_model ?? '',
+    license_plate: driver?.license_plate ?? '',
+    location: driver?.location ?? '',
+    appeal_reason: '',
+  })
+  
+  const [requirements, setRequirements] = useState<{id: string, name: string, required: boolean}[]>([
+    { id: 'primary_document', name: 'Primary Document', required: false }
+  ])
+  const [files, setFiles] = useState<Record<string, File | string>>({})
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+
+  // Keep form in sync when driver changes
+  useEffect(() => {
+    if (!driver) return
+    setForm({
+      full_name: driver.full_name ?? '',
+      phone: driver.phone ?? '',
+      car_model: driver.car_model ?? '',
+      license_plate: driver.license_plate ?? '',
+      location: driver.location ?? '',
+      appeal_reason: '',
+    })
+
+    // Load requirements
+    api.get('/settings').then(res => {
+      if (res.data?.driver_document_requirements) {
+        setRequirements(res.data.driver_document_requirements)
+      }
+    }).catch(console.error)
+
+    // Pre-fill existing documents
+    const initialFiles: Record<string, string> = {}
+    if (driver.documents && driver.documents.length > 0) {
+      driver.documents.forEach(doc => {
+        initialFiles[doc.type_id] = doc.url
+      })
+    } else if (driver.document_url) {
+      initialFiles['primary_document'] = driver.document_url
+    }
+    setFiles(initialFiles)
+  }, [driver])
+
+  function setField(field: string, value: string) {
+    setForm(f => ({ ...f, [field]: value }))
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!driver) return
+    const d = driver // narrowed, stable across await boundaries
+    setError('')
+    if (form.appeal_reason.trim().length < 10) {
+      setError(t('appeal.reason_label') + ' — at least 10 characters required')
+      tg?.HapticFeedback?.notificationOccurred('error')
+      return
+    }
+
+    const missingDocs = requirements.filter(r => r.required && !files[r.id])
+    if (missingDocs.length > 0) {
+      setError(`Please provide: ${missingDocs.map(m => m.name).join(', ')}`)
+      tg?.HapticFeedback?.notificationOccurred('error')
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const documents: { type_id: string; url: string }[] = []
+      for (const [type_id, fileOrUrl] of Object.entries(files)) {
+        if (fileOrUrl instanceof File) {
+          const url = await uploadDocument(fileOrUrl)
+          documents.push({ type_id, url })
+        } else if (typeof fileOrUrl === 'string') {
+          documents.push({ type_id, url: fileOrUrl })
+        }
+      }
+
+      await api.patch(`/drivers/${d.id}/appeal`, {
+        appeal_reason: form.appeal_reason.trim(),
+        full_name: form.full_name.trim() || undefined,
+        phone: form.phone.trim() || undefined,
+        car_model: form.car_model.trim() || undefined,
+        license_plate: form.license_plate.trim() || undefined,
+        location: form.location.trim() || undefined,
+        documents,
+      })
+
+      tg?.HapticFeedback?.notificationOccurred('success')
+      queryClient.invalidateQueries({ queryKey: ['my_drivers'] })
+      setSuccess(true)
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Something went wrong')
+      tg?.HapticFeedback?.notificationOccurred('error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // Guard: no driver selected
+  if (!driver) return null
+
+  // Guard: already appealed
+  if (driver.appealed) {
+    return (
+      <Modal isOpen onClose={onClose} title={t('appeal.title')}>
+        <div className="p-4 text-center space-y-4">
+          <div className="w-16 h-16 neu-circle flex items-center justify-center mx-auto text-3xl">⚠️</div>
+          <p className="text-sm font-bold text-slate-600">{t('appeal.already_appealed')}</p>
+          <button onClick={onClose} className="neu-button px-8 py-3 rounded-xl font-black text-slate-600 text-sm">
+            {t('common.close')}
+          </button>
+        </div>
+      </Modal>
+    )
+  }
+
+  const inputCls =
+    'w-full neu-pressed text-sm text-slate-700 font-bold placeholder-slate-400 outline-none p-4 rounded-xl transition-colors disabled:opacity-50'
+
+  if (success) {
+    return (
+      <Modal isOpen onClose={onClose} title={t('appeal.title')}>
+        <div className="p-4 text-center space-y-4">
+          <div className="w-16 h-16 neu-circle flex items-center justify-center mx-auto">
+            <CheckCircle className="w-8 h-8 text-emerald-500" />
+          </div>
+          <p className="text-sm font-bold text-slate-600">{t('appeal.success')}</p>
+          <button onClick={onClose} className="neu-button px-8 py-3 rounded-xl font-black text-emerald-600 text-sm">
+            {t('common.close')}
+          </button>
+        </div>
+      </Modal>
+    )
+  }
+
+  return (
+    <Modal isOpen onClose={onClose} title={t('appeal.title')}>
+      <div className="space-y-5 px-1 pb-2">
+        {/* Subtitle */}
+        <p className="text-xs text-slate-500 font-semibold leading-relaxed">{t('appeal.subtitle')}</p>
+
+        {/* Previous admin note */}
+        {driver.admin_note && (
+          <div className="flex gap-3 neu-pressed rounded-xl p-3 border-l-4 border-red-400">
+            <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[10px] font-black text-red-500 uppercase tracking-wider mb-1">Admin Note</p>
+              <p className="text-xs text-red-700 font-semibold">{driver.admin_note}</p>
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Editable fields */}
+          <div className="space-y-3">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Driver Information</p>
+            <input
+              type="text"
+              placeholder={t('register.full_name')}
+              value={form.full_name}
+              onChange={e => setField('full_name', e.target.value)}
+              className={inputCls}
+              disabled={submitting}
+            />
+            <input
+              type="tel"
+              placeholder={t('register.phone')}
+              value={form.phone}
+              onChange={e => setField('phone', e.target.value)}
+              className={inputCls}
+              disabled={submitting}
+            />
+            <input
+              type="text"
+              placeholder="Car Model"
+              value={form.car_model}
+              onChange={e => setField('car_model', e.target.value)}
+              className={inputCls}
+              disabled={submitting}
+            />
+            <input
+              type="text"
+              placeholder={t('register.license_plate')}
+              value={form.license_plate}
+              onChange={e => setField('license_plate', e.target.value.toUpperCase())}
+              className={`${inputCls} uppercase`}
+              disabled={submitting}
+            />
+            <input
+              type="text"
+              placeholder={t('register.location')}
+              value={form.location}
+              onChange={e => setField('location', e.target.value)}
+              className={inputCls}
+              disabled={submitting}
+            />
+          </div>
+
+          {/* Document upload */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('appeal.document_label')}</p>
+            {requirements.map(req => {
+              const fileData = files[req.id]
+              const hasFile = !!fileData
+              const fileName = fileData instanceof File ? fileData.name : (hasFile ? t('register.existing_document') : t('register.upload') + req.name)
+              
+              return (
+                <label key={req.id} className={`flex items-center gap-3 p-4 neu-pressed rounded-xl cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  <div className="w-10 h-10 neu-circle flex items-center justify-center shrink-0">
+                    {hasFile ? <span className="text-lg">✅</span> : <Paperclip className="w-4 h-4 text-blue-500" />}
+                  </div>
+                  <div className="truncate flex-1">
+                    <p className="text-sm font-bold text-slate-700 truncate">
+                      {fileName}
+                    </p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                      {req.required ? t('register.required') : t('register.optional')}
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    className="hidden"
+                    disabled={submitting}
+                    onChange={e => {
+                      const newFile = e.target.files?.[0]
+                      if (newFile) setFiles(f => ({ ...f, [req.id]: newFile }))
+                    }}
+                  />
+                </label>
+              )
+            })}
+          </div>
+
+          {/* Appeal reason */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('appeal.reason_label')}</p>
+            <textarea
+              rows={4}
+              placeholder={t('appeal.reason_placeholder')}
+              value={form.appeal_reason}
+              onChange={e => setField('appeal_reason', e.target.value)}
+              className={`${inputCls} resize-none`}
+              disabled={submitting}
+            />
+          </div>
+
+          {error && (
+            <div className="neu-pressed rounded-xl p-3 text-xs font-bold text-red-600">{error}</div>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full p-4 rounded-2xl font-black bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white shadow-[0_8px_20px_rgba(245,158,11,0.35)] transition-colors"
+          >
+            {submitting ? t('appeal.submitting') : t('appeal.submit')}
+          </button>
+        </form>
+      </div>
+    </Modal>
+  )
+}
