@@ -59,20 +59,26 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
       appeal_reason: '',
     })
 
-    // Load requirements
+    // Load requirements from settings
     api.get('/settings').then(res => {
-      if (res.data?.driver_document_requirements) {
-        setRequirements(res.data.driver_document_requirements)
+      if (res?.driver_document_requirements?.length) {
+        setRequirements(res.driver_document_requirements)
       }
     }).catch(console.error)
 
-    // Pre-fill existing documents
+    // Pre-fill existing documents (handle object {type_id, url} or plain string)
     const initialFiles: Record<string, string> = {}
-    if (driver.documents && driver.documents.length > 0) {
-      driver.documents.forEach(doc => {
-        initialFiles[doc.type_id] = doc.url
-      })
-    } else if (driver.document_url) {
+    const docs: any[] = driver.documents || []
+    docs.forEach((doc: any) => {
+      if (typeof doc === 'string' && doc) {
+        initialFiles['primary_document'] = doc
+      } else if (doc && typeof doc === 'object') {
+        const url = doc.url || doc.document_url || doc.file_url || ''
+        const type_id = doc.type_id || 'primary_document'
+        if (url) initialFiles[type_id] = url
+      }
+    })
+    if (Object.keys(initialFiles).length === 0 && driver.document_url) {
       initialFiles['primary_document'] = driver.document_url
     }
     setFiles(initialFiles)

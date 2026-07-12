@@ -38,8 +38,8 @@ function AgentAccountAppeal({ onAppealed }: { onAppealed: () => void }) {
 
   useEffect(() => {
     api.get('/settings').then(res => {
-      if (res.data?.agent_document_requirements) {
-        setRequirements(res.data.agent_document_requirements)
+      if (res?.agent_document_requirements?.length) {
+        setRequirements(res.agent_document_requirements)
       }
     }).catch(console.error)
   }, [])
