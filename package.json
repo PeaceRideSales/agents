@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
-    "preview": "vite preview"
+    "dev": "node ./node_modules/.ignored_vite/bin/vite.js",
+    "build": "node ./node_modules/.ignored_vite/bin/vite.js build",
+    "typecheck": "node ../../node_modules/.pnpm/typescript@6.0.3/node_modules/typescript/lib/tsc.js -b tsconfig.app.json",
+    "lint": "node ./node_modules/.ignored_oxlint/bin/oxlint",
+    "preview": "node ./node_modules/.ignored_vite/bin/vite.js preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",
