@@ -133,7 +133,7 @@ export default function App() {
 
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 bg-blue-600 sticky top-0 z-50 shadow-md">
-        <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center shadow-inner">
+        <div className="w-10 h-10 bg-blue-700 rounded-3xl flex items-center justify-center shadow-inner">
           <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain filter brightness-0 invert"
             onError={e => (e.currentTarget.style.display = 'none')} />
         </div>
@@ -143,13 +143,13 @@ export default function App() {
         </div>
         
         {/* Language Toggle */}
-        <div className="flex items-center bg-blue-700 rounded-lg p-1 shrink-0 shadow-inner">
+        <div className="flex items-center bg-blue-700 rounded-2xl p-1 shrink-0 shadow-inner">
           <button
             onClick={() => {
               setLanguage('en')
               tg?.HapticFeedback?.selectionChanged()
             }}
-            className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${language === 'en' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-200 hover:text-white'}`}
+            className={`px-2 py-1 text-xs font-bold rounded-xl transition-colors ${language === 'en' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-200 hover:text-white'}`}
           >
             EN
           </button>
@@ -158,7 +158,7 @@ export default function App() {
               setLanguage('am')
               tg?.HapticFeedback?.selectionChanged()
             }}
-            className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${language === 'am' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-200 hover:text-white'}`}
+            className={`px-2 py-1 text-xs font-bold rounded-xl transition-colors ${language === 'am' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-200 hover:text-white'}`}
           >
             አማ
           </button>

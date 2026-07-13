@@ -115,7 +115,7 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-lg">
+        <div className="bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-2xl shadow-lg">
           <p className="mb-1 text-slate-400">{label}</p>
           <p className="text-blue-400">${payload[0].value.toFixed(2)}</p>
         </div>
@@ -128,28 +128,28 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
     <div className="space-y-6 pb-6">
       
       {/* Balance Card */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 shadow-lg shadow-blue-500/30 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-4 opacity-20">
-          <Wallet className="w-24 h-24" />
+      <div className="neu-card-blue rounded-3xl p-6 relative overflow-hidden text-white">
+        <div className="absolute top-0 right-0 p-4 opacity-10">
+          <Wallet className="w-24 h-24 text-white" />
         </div>
-        <h2 className="text-blue-100 font-semibold mb-1 relative z-10 flex items-center gap-2">
+        <h2 className="text-blue-200 font-bold uppercase tracking-widest text-xs mb-1 relative z-10 flex items-center gap-2">
           {t('wallet.total_earned')}
         </h2>
-        <div className="text-4xl font-bold mb-4 relative z-10">
+        <div className="text-4xl font-black text-white mb-4 relative z-10 tracking-tighter drop-shadow-md">
           ${stats?.earnings?.toFixed(2) || '0.00'}
         </div>
-        <div className="flex gap-4 relative z-10">
-          <div className="bg-white/20 px-3 py-1.5 rounded-lg text-sm font-semibold backdrop-blur-sm flex items-center gap-1">
-            <DollarSign className="w-4 h-4" />{stats?.priceLatest || 150} <span className="text-[10px] opacity-80 uppercase">Latest/EV</span>
+        <div className="flex gap-3 relative z-10">
+          <div className="neu-pressed-blue px-4 py-2 rounded-3xl text-sm font-black text-white flex items-center gap-1">
+            <DollarSign className="w-4 h-4" />{stats?.priceLatest || 150} <span className="text-[10px] text-blue-200 uppercase ml-1">Latest/EV</span>
           </div>
-          <div className="bg-white/20 px-3 py-1.5 rounded-lg text-sm font-semibold backdrop-blur-sm flex items-center gap-1">
-            <DollarSign className="w-4 h-4" />{stats?.priceOlder || 120} <span className="text-[10px] opacity-80 uppercase">Older</span>
+          <div className="neu-pressed-blue px-4 py-2 rounded-3xl text-sm font-black text-white flex items-center gap-1">
+            <DollarSign className="w-4 h-4" />{stats?.priceOlder || 120} <span className="text-[10px] text-blue-200 uppercase ml-1">Older</span>
           </div>
         </div>
       </div>
 
       {/* Analytics Chart */}
-      <div className="neu-card rounded-2xl p-5">
+      <div className="neu-card rounded-3xl p-5">
         <div className="flex justify-between items-start mb-5">
           <div>
             <h3 className="font-black text-slate-700 text-sm">7-Day Earnings Trend</h3>
@@ -183,19 +183,19 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
       </div>
 
       {/* Agent Tier */}
-      <div className="neu-button rounded-2xl p-5 flex items-center justify-between">
+      <div className="neu-button rounded-3xl p-5 flex items-center justify-between">
         <div>
           <h3 className="font-black text-slate-700 text-sm">{t('wallet.current_tier')}</h3>
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Unlock better rates</p>
         </div>
-        <div className={`px-4 py-2 rounded-xl font-black flex items-center gap-2 neu-pressed border-none ${tier.color.split(' ')[0]}`}>
+        <div className={`px-4 py-2 rounded-3xl font-black flex items-center gap-2 neu-pressed border-none ${tier.color.split(' ')[0]}`}>
           <span className="text-xl">{tier.icon}</span>
           {tier.name}
         </div>
       </div>
 
       {/* Payment Settings */}
-      <div className="neu-card rounded-2xl overflow-hidden pb-4">
+      <div className="neu-card rounded-3xl overflow-hidden pb-4">
         <div className="p-5 flex items-center gap-3">
           <div className="w-10 h-10 neu-circle flex items-center justify-center">
             <CreditCard className="w-5 h-5 text-blue-600" />
@@ -218,7 +218,7 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
                   setMethod(e.target.value)
                   tg?.HapticFeedback?.selectionChanged()
                 }}
-                className="w-full appearance-none neu-pressed text-slate-700 font-bold text-sm rounded-xl block p-4 pr-8 outline-none border-none"
+                className="w-full appearance-none neu-pressed text-slate-700 font-bold text-sm rounded-3xl block p-4 pr-8 outline-none border-none"
                 disabled={saving}
               >
                 <option value="" disabled>Select method...</option>
@@ -241,7 +241,7 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
               value={details}
               onChange={e => setDetails(e.target.value)}
               placeholder="e.g. 100012345678"
-              className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-xl block p-4 outline-none border-none placeholder-slate-400"
+              className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-3xl block p-4 outline-none border-none placeholder-slate-400"
               disabled={saving}
             />
           </div>
@@ -249,8 +249,8 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
           <button 
             onClick={handleSave}
             disabled={saving || !method || !details}
-            className={`w-full flex justify-center items-center gap-2 font-black rounded-xl px-4 py-4 text-white transition-colors ${
-              saved ? 'bg-emerald-500 shadow-[0_10px_20px_rgba(16,185,129,0.3)]' : 'bg-blue-600 shadow-[0_10px_20px_rgba(37,99,235,0.3)] hover:bg-blue-700 disabled:opacity-50 disabled:shadow-none'
+            className={`w-full flex justify-center items-center gap-2 font-black rounded-3xl px-4 py-4 transition-colors ${
+              saved ? 'neu-pressed text-emerald-600' : 'neu-button text-blue-600 hover:text-blue-700 disabled:opacity-50'
             }`}
           >
             {saving ? (
@@ -265,7 +265,7 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
       </div>
 
       {/* Target Goals Settings */}
-      <div className="neu-card rounded-2xl overflow-hidden pb-4">
+      <div className="neu-card rounded-3xl overflow-hidden pb-4">
         <div className="p-5 flex items-center gap-3">
           <div className="w-10 h-10 neu-circle flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-emerald-600" />
@@ -285,7 +285,7 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
                 value={dailyTarget}
                 onChange={e => setDailyTarget(e.target.value)}
                 placeholder="0"
-                className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-xl block p-3 text-center outline-none border-none placeholder-slate-400"
+                className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-3xl block p-3 text-center outline-none border-none placeholder-slate-400"
                 disabled={savingTargets}
               />
             </div>
@@ -296,7 +296,7 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
                 value={weeklyTarget}
                 onChange={e => setWeeklyTarget(e.target.value)}
                 placeholder="0"
-                className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-xl block p-3 text-center outline-none border-none placeholder-slate-400"
+                className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-3xl block p-3 text-center outline-none border-none placeholder-slate-400"
                 disabled={savingTargets}
               />
             </div>
@@ -307,7 +307,7 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
                 value={monthlyTarget}
                 onChange={e => setMonthlyTarget(e.target.value)}
                 placeholder="0"
-                className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-xl block p-3 text-center outline-none border-none placeholder-slate-400"
+                className="w-full neu-pressed text-slate-700 font-bold text-sm rounded-3xl block p-3 text-center outline-none border-none placeholder-slate-400"
                 disabled={savingTargets}
               />
             </div>
@@ -316,8 +316,8 @@ export default function WalletTab({ agent, onUpdateAgent }: WalletTabProps) {
           <button 
             onClick={handleSaveTargets}
             disabled={savingTargets}
-            className={`w-full flex justify-center items-center gap-2 font-black rounded-xl px-4 py-4 text-white transition-colors ${
-              savedTargets ? 'bg-emerald-500 shadow-[0_10px_20px_rgba(16,185,129,0.3)]' : 'bg-slate-700 shadow-[0_10px_20px_rgba(51,65,85,0.3)] hover:bg-slate-800 disabled:opacity-50 disabled:shadow-none'
+            className={`w-full flex justify-center items-center gap-2 font-black rounded-3xl px-4 py-4 transition-colors ${
+              savedTargets ? 'neu-pressed text-emerald-600' : 'neu-button text-slate-700 hover:text-slate-800 disabled:opacity-50'
             }`}
           >
             {savingTargets ? (

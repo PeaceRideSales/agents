@@ -157,12 +157,12 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
     }))
   }
 
-  const inputCls = "w-full neu-pressed text-sm text-slate-700 font-bold placeholder-slate-400 outline-none p-4 rounded-xl transition-colors disabled:opacity-50"
+  const inputCls = "w-full neu-pressed text-sm text-slate-700 font-bold placeholder-slate-400 outline-none p-4 rounded-3xl transition-colors disabled:opacity-50"
 
   return (
     <div className="pb-4 pt-2">
       {error && (
-        <div className="neu-pressed rounded-xl p-4 text-sm font-bold text-red-600 mb-6">{error}</div>
+        <div className="neu-pressed rounded-3xl p-4 text-sm font-bold text-red-600 mb-6">{error}</div>
       )}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="neu-card rounded-3xl p-6">
@@ -200,7 +200,7 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
             {requirements.map(req => {
               const reqFiles = files[req.id] || []
               return (
-                <div key={req.id} className={`p-4 neu-pressed rounded-xl ${submitting ? 'opacity-50' : ''}`}>
+                <div key={req.id} className={`p-4 neu-pressed rounded-3xl ${submitting ? 'opacity-50' : ''}`}>
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="text-sm font-bold text-slate-700">{req.name}</p>
@@ -215,7 +215,7 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
                   {reqFiles.length > 0 && (
                     <div className="space-y-2 mt-3">
                       {reqFiles.map((file, idx) => (
-                        <div key={idx} className="flex items-center justify-between bg-white/50 border border-slate-200 rounded-lg p-2 text-xs font-semibold text-slate-600 shadow-sm">
+                        <div key={idx} className="flex items-center justify-between bg-white/50 border border-slate-200 rounded-2xl p-2 text-xs font-semibold text-slate-600 shadow-sm">
                           <span className="truncate max-w-[200px]">{file.name}</span>
                           <button type="button" disabled={submitting} onClick={() => removeFile(req.id, idx)} className="p-1 hover:bg-red-50 text-red-500 rounded">
                             <X className="w-3 h-3" />
@@ -231,11 +231,11 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
         </div>
 
         <button type="submit" disabled={submitting}
-          className="w-full p-5 rounded-2xl font-black bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-colors mt-4 relative overflow-hidden">
-          {submitting && uploadPercent > 0 && uploadPercent < 100 && (
-            <div className="absolute left-0 top-0 bottom-0 bg-blue-800 transition-all duration-300 opacity-30" style={{ width: `${uploadPercent}%` }} />
+          className="w-full p-5 rounded-3xl font-black bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-colors mt-4 relative overflow-hidden">
+          {submitting && uploadPercent > 0 && (
+            <div className="absolute left-0 top-0 bottom-0 bg-blue-400/50 fluid-bar transition-all duration-300" style={{ width: `${uploadPercent}%` }} />
           )}
-          <span className="relative z-10">
+          <span className="relative z-10 drop-shadow-md">
             {submitting ? (uploadPercent > 0 && uploadPercent < 100 ? `Uploading... ${uploadPercent}%` : t('register.submitting')) : t('register.submit')}
           </span>
         </button>

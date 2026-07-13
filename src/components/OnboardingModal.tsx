@@ -12,16 +12,16 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
     <div className="fixed inset-0 z-50 neu-bg flex flex-col">
       {/* Header with Language Toggle */}
       <div className="flex justify-end p-4">
-        <div className="flex items-center neu-pressed rounded-xl p-1.5">
+        <div className="flex items-center neu-pressed rounded-3xl p-1.5">
           <button
             onClick={() => setLanguage('en')}
-            className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all ${language === 'en' ? 'neu-card text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+            className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-2xl transition-all ${language === 'en' ? 'neu-card text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
           >
             English
           </button>
           <button
             onClick={() => setLanguage('am')}
-            className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all ${language === 'am' ? 'neu-card text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+            className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-2xl transition-all ${language === 'am' ? 'neu-card text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
           >
             አማርኛ
           </button>
@@ -73,7 +73,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
         <div className="mt-12">
           <button
             onClick={onComplete}
-            className="w-full bg-blue-600 text-white font-black uppercase tracking-widest text-sm py-5 rounded-2xl shadow-[5px_5px_15px_rgba(37,99,235,0.4),-5px_-5px_15px_rgba(255,255,255,0.5)] hover:bg-blue-700 transition-colors"
+            className="w-full bg-blue-600 text-white font-black uppercase tracking-widest text-sm py-5 rounded-3xl shadow-[5px_5px_15px_rgba(37,99,235,0.4),-5px_-5px_15px_rgba(255,255,255,0.5)] hover:bg-blue-700 transition-colors"
           >
             {t('onboarding.button')}
           </button>

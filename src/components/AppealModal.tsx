@@ -142,23 +142,10 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
   // Guard: no driver selected
   if (!driver) return null
 
-  // Guard: already appealed
-  if (driver.appealed) {
-    return (
-      <Modal isOpen onClose={onClose} title={t('appeal.title')}>
-        <div className="p-4 text-center space-y-4">
-          <div className="w-16 h-16 neu-circle flex items-center justify-center mx-auto text-3xl">⚠️</div>
-          <p className="text-sm font-bold text-slate-600">{t('appeal.already_appealed')}</p>
-          <button onClick={onClose} className="neu-button px-8 py-3 rounded-xl font-black text-slate-600 text-sm">
-            {t('common.close')}
-          </button>
-        </div>
-      </Modal>
-    )
-  }
+  // The 'already appealed' guard has been removed so agents can edit/appeal more than once.
 
   const inputCls =
-    'w-full neu-pressed text-sm text-slate-700 font-bold placeholder-slate-400 outline-none p-4 rounded-xl transition-colors disabled:opacity-50'
+    'w-full neu-pressed text-sm text-slate-700 font-bold placeholder-slate-400 outline-none p-4 rounded-3xl transition-colors disabled:opacity-50'
 
   if (success) {
     return (
@@ -168,7 +155,7 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
             <CheckCircle className="w-8 h-8 text-emerald-500" />
           </div>
           <p className="text-sm font-bold text-slate-600">{t('appeal.success')}</p>
-          <button onClick={onClose} className="neu-button px-8 py-3 rounded-xl font-black text-emerald-600 text-sm">
+          <button onClick={onClose} className="neu-button px-8 py-3 rounded-3xl font-black text-emerald-600 text-sm">
             {t('common.close')}
           </button>
         </div>
@@ -184,7 +171,7 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
 
         {/* Previous admin note */}
         {driver.admin_note && (
-          <div className="flex gap-3 neu-pressed rounded-xl p-3 border-l-4 border-red-400">
+          <div className="flex gap-3 neu-pressed rounded-3xl p-3 border-l-4 border-red-400">
             <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-[10px] font-black text-red-500 uppercase tracking-wider mb-1">Admin Note</p>
@@ -248,7 +235,7 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
               const fileName = fileData instanceof File ? fileData.name : (hasFile ? t('register.existing_document') : t('register.upload') + req.name)
               
               return (
-                <label key={req.id} className={`flex items-center gap-3 p-4 neu-pressed rounded-xl cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <label key={req.id} className={`flex items-center gap-3 p-4 neu-pressed rounded-3xl cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
                   <div className="w-10 h-10 neu-circle flex items-center justify-center shrink-0">
                     {hasFile ? <span className="text-lg">✅</span> : <Paperclip className="w-4 h-4 text-blue-500" />}
                   </div>
@@ -289,13 +276,13 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
           </div>
 
           {error && (
-            <div className="neu-pressed rounded-xl p-3 text-xs font-bold text-red-600">{error}</div>
+            <div className="neu-pressed rounded-3xl p-3 text-xs font-bold text-red-600">{error}</div>
           )}
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full p-4 rounded-2xl font-black bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white shadow-[0_8px_20px_rgba(245,158,11,0.35)] transition-colors"
+            className="w-full p-4 rounded-3xl font-black bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white shadow-[0_8px_20px_rgba(245,158,11,0.35)] transition-colors"
           >
             {submitting ? t('appeal.submitting') : t('appeal.submit')}
           </button>
