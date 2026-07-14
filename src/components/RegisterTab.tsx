@@ -20,7 +20,7 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
     full_name: '', phone: '', license_plate: '',
     car_model: '',
     vehicle_category: 'OLDER',
-    location: 'Addis Ababa'
+    location: ''
   })
   const [requirements, setRequirements] = useState<DocumentRequirement[]>([
     { id: 'primary_document', name: 'Primary Document', required: false }
@@ -170,7 +170,7 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
           <div className="space-y-4">
             <input type="text" placeholder={`${t('register.full_name')} *`} value={form.full_name} onChange={e => setField('full_name', e.target.value)} className={inputCls} disabled={submitting} />
             <input type="tel" placeholder={`${t('register.phone')} (e.g. 09...) *`} value={form.phone} onChange={e => setField('phone', e.target.value)} className={inputCls} disabled={submitting} />
-            <input type="text" placeholder={`${t('register.location')} *`} value={form.location} onChange={e => setField('location', e.target.value)} className={inputCls} disabled={submitting} />
+            <input type="text" placeholder={`e.g. Addis Ababa *`} value={form.location} onChange={e => setField('location', e.target.value)} className={inputCls} disabled={submitting} />
           </div>
         </div>
 
