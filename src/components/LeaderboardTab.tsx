@@ -18,7 +18,7 @@ export default function LeaderboardTab() {
     queryFn: () => api.get('/agents/me'),
   })
 
-  const { data: rankData, isLoading } = useQuery<RankData>({
+  const { data: rankData, isLoading, refetch, isFetching } = useQuery<RankData>({
     queryKey: ['my_rank'],
     queryFn: () => api.get('/agents/me/rank'),
     refetchInterval: 30000,
@@ -55,7 +55,7 @@ export default function LeaderboardTab() {
     return { label: 'Rising', color: 'text-slate-500', dot: 'bg-slate-400' }
   }
 
-  if (isLoading) {
+  if (isLoading && !rankData) {
     return (
       <div className="space-y-5 animate-pulse pt-4 pb-8">
         <div className="rounded-[28px] bg-slate-200/60 h-64" />
@@ -78,6 +78,19 @@ export default function LeaderboardTab() {
 
   return (
     <div className="space-y-5 pb-8 pt-2">
+      <div className="flex justify-between items-center px-2">
+        <h2 className="text-xl font-black text-slate-700">Leaderboard</h2>
+        <button 
+          onClick={() => refetch()} 
+          disabled={isFetching}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-black uppercase tracking-widest hover:bg-blue-200 transition-colors disabled:opacity-50"
+        >
+          <svg className={`w-3 h-3 ${isFetching ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          {isFetching ? 'Refreshing...' : 'Refresh'}
+        </button>
+      </div>
 
       {/* ── HERO RANK CARD ── */}
       <div className="neu-card-blue rounded-3xl relative overflow-hidden text-white">
