@@ -124,7 +124,7 @@ export default function DashboardTab() {
             {/* Logo at the top of the circle */}
             <div className="absolute top-4">
               <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain filter brightness-0 invert" onError={e => (e.currentTarget.style.display = 'none')} />
+                <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain " onError={e => (e.currentTarget.style.display = 'none')} />
               </div>
             </div>
 

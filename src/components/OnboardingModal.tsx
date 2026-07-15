@@ -31,7 +31,7 @@ export default function OnboardingModal({ onComplete }: OnboardingModalProps) {
       <div className="flex-1 overflow-y-auto p-6 flex flex-col justify-center max-w-md mx-auto w-full">
         <div className="text-center mb-8">
           <div className="w-24 h-24 bg-blue-600 rounded-3xl flex items-center justify-center shadow-lg shadow-blue-500/30 mx-auto mb-6">
-            <img src="/logo.png" alt="Peace Ride" className="w-12 h-12 object-contain filter brightness-0 invert"
+            <img src="/logo.png" alt="Peace Ride" className="w-12 h-12 object-contain "
               onError={e => (e.currentTarget.style.display = 'none')} />
           </div>
           <h1 className="text-3xl font-black text-slate-700 mb-2">{t('onboarding.welcome')}</h1>

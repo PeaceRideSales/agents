@@ -134,7 +134,7 @@ export default function App() {
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 bg-blue-600 sticky top-0 z-50 shadow-md">
         <div className="w-10 h-10 bg-blue-700 rounded-3xl flex items-center justify-center shadow-inner">
-          <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain filter brightness-0 invert"
+          <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain "
             onError={e => (e.currentTarget.style.display = 'none')} />
         </div>
         <div className="flex-1">

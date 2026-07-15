@@ -205,7 +205,7 @@ export default function StatusScreens({ screen, error, agent, onSuccessContinue 
   if (screen === 'loading') return (
     <div className="flex-1 flex flex-col items-center justify-center text-center p-8 min-h-screen bg-blue-600">
       <div className="w-24 h-24 bg-white/10 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-2xl mb-8 p-4 border border-white/20 status-pulse">
-        <img src="/logo.png" alt="Peace Ride Logo" className="w-full h-full object-contain filter brightness-0 invert opacity-90 relative z-10" />
+        <img src="/logo.png" alt="Peace Ride Logo" className="w-full h-full object-contain  opacity-90 relative z-10" />
       </div>
       <h1 className="text-3xl font-black text-white tracking-tighter mb-2">Peace Ride</h1>
       <p className="text-blue-100 font-medium tracking-widest uppercase text-xs mb-8">Agent Reporting Portal</p>
