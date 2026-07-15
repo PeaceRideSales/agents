@@ -112,6 +112,7 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
 
     setSubmitting(true)
     try {
+      const documents: any[] = []
       for (const [type_id, fileArray] of Object.entries(files)) {
         if (!fileArray) continue;
         for (const fileOrUrl of fileArray) {
