@@ -262,18 +262,16 @@ export default function DashboardTab() {
                   {d.status === 'DECLINED' && d.admin_note && (
                     <div className="text-xs text-red-500 font-bold mt-1 italic">"{d.admin_note}"</div>
                   )}
-                  {d.status === 'DECLINED' && !d.appealed && (
+                  {d.status !== 'VERIFIED' && (
                     <button
                       onClick={e => { e.stopPropagation(); setAppealDriver(d) }}
-                      className="mt-2 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-amber-600 neu-pressed px-3 py-1.5 rounded-full"
+                      className="mt-2 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-blue-600 neu-pressed px-3 py-1.5 rounded-full"
                     >
                       <AlertCircle className="w-3 h-3" />
-                      {t('appeal.submit')}
+                      Edit Registration
                     </button>
                   )}
-                  {d.status === 'DECLINED' && d.appealed && (
-                    <div className="mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-wide">Appeal submitted ✓</div>
-                  )}
+
                 </div>
                 <div className={`flex items-center gap-1.5 text-[10px] uppercase neu-pressed px-3 py-1.5 rounded-full ${sb.cls}`}>
                   <Icon className="w-3.5 h-3.5" />
@@ -316,13 +314,13 @@ export default function DashboardTab() {
                 <span className="uppercase tracking-wider text-xs block mb-1">Admin note:</span> {selected.admin_note}
               </div>
             )}
-            {selected.status === 'DECLINED' && (
+            {selected.status !== 'VERIFIED' && (
               <button
                 onClick={() => { setSelected(null); setAppealDriver(selected) }}
-                className="w-full p-4 rounded-3xl font-black bg-amber-500 text-white shadow-[0_8px_20px_rgba(245,158,11,0.3)] hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 text-sm"
+                className="w-full p-4 rounded-3xl font-black bg-blue-500 text-white shadow-[0_8px_20px_rgba(59,130,246,0.3)] hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 <AlertCircle className="w-4 h-4" />
-                {t('appeal.title')}
+                Edit Registration
               </button>
             )}
           </div>

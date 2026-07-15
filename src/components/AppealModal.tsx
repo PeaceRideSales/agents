@@ -42,7 +42,7 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
   const [requirements, setRequirements] = useState<{id: string, name: string, required: boolean}[]>([
     { id: 'primary_document', name: 'Primary Document', required: false }
   ])
-  const [files, setFiles] = useState<Record<string, File | string>>({})
+  const [files, setFiles] = useState<Record<string, Array<File | string>>>({})
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -66,20 +66,24 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
       }
     }).catch(console.error)
 
-    // Pre-fill existing documents (handle object {type_id, url} or plain string)
-    const initialFiles: Record<string, string> = {}
+    // Pre-fill existing documents
+    const initialFiles: Record<string, string[]> = {}
     const docs: any[] = driver.documents || []
     docs.forEach((doc: any) => {
       if (typeof doc === 'string' && doc) {
-        initialFiles['primary_document'] = doc
+        if (!initialFiles['primary_document']) initialFiles['primary_document'] = [];
+        initialFiles['primary_document'].push(doc);
       } else if (doc && typeof doc === 'object') {
         const url = doc.url || doc.document_url || doc.file_url || ''
         const type_id = doc.type_id || 'primary_document'
-        if (url) initialFiles[type_id] = url
+        if (url) {
+          if (!initialFiles[type_id]) initialFiles[type_id] = [];
+          initialFiles[type_id].push(url);
+        }
       }
     })
     if (Object.keys(initialFiles).length === 0 && driver.document_url) {
-      initialFiles['primary_document'] = driver.document_url
+      initialFiles['primary_document'] = [driver.document_url]
     }
     setFiles(initialFiles)
   }, [driver])
@@ -93,13 +97,13 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
     if (!driver) return
     const d = driver // narrowed, stable across await boundaries
     setError('')
-    if (form.appeal_reason.trim().length < 10) {
+    if (driver.status === 'DECLINED' && form.appeal_reason.trim().length > 0 && form.appeal_reason.trim().length < 10) {
       setError(t('appeal.reason_label') + ' — at least 10 characters required')
       tg?.HapticFeedback?.notificationOccurred('error')
       return
     }
 
-    const missingDocs = requirements.filter(r => r.required && !files[r.id])
+    const missingDocs = requirements.filter(r => r.required && (!files[r.id] || files[r.id].length === 0))
     if (missingDocs.length > 0) {
       setError(`Please provide: ${missingDocs.map(m => m.name).join(', ')}`)
       tg?.HapticFeedback?.notificationOccurred('error')
@@ -108,13 +112,15 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
 
     setSubmitting(true)
     try {
-      const documents: { type_id: string; url: string }[] = []
-      for (const [type_id, fileOrUrl] of Object.entries(files)) {
-        if (fileOrUrl instanceof File) {
-          const url = await uploadDocument(fileOrUrl)
-          documents.push({ type_id, url })
-        } else if (typeof fileOrUrl === 'string') {
-          documents.push({ type_id, url: fileOrUrl })
+      for (const [type_id, fileArray] of Object.entries(files)) {
+        if (!fileArray) continue;
+        for (const fileOrUrl of fileArray) {
+          if (fileOrUrl instanceof File) {
+            const url = await uploadDocument(fileOrUrl)
+            documents.push({ type_id, url })
+          } else if (typeof fileOrUrl === 'string') {
+            documents.push({ type_id, url: fileOrUrl })
+          }
         }
       }
 
@@ -149,7 +155,7 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
 
   if (success) {
     return (
-      <Modal isOpen onClose={onClose} title={t('appeal.title')}>
+      <Modal isOpen onClose={onClose} title="Edit Registration">
         <div className="p-4 text-center space-y-4">
           <div className="w-16 h-16 neu-circle flex items-center justify-center mx-auto">
             <CheckCircle className="w-8 h-8 text-emerald-500" />
@@ -164,10 +170,10 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
   }
 
   return (
-    <Modal isOpen onClose={onClose} title={t('appeal.title')}>
+    <Modal isOpen onClose={onClose} title="Edit Registration">
       <div className="space-y-5 px-1 pb-2">
         {/* Subtitle */}
-        <p className="text-xs text-slate-500 font-semibold leading-relaxed">{t('appeal.subtitle')}</p>
+        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Update driver information or upload additional documents.</p>
 
         {/* Previous admin note */}
         {driver.admin_note && (
@@ -226,45 +232,54 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
             />
           </div>
 
-          {/* Document upload */}
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('appeal.document_label')}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Documents</p>
             {requirements.map(req => {
-              const fileData = files[req.id]
-              const hasFile = !!fileData
-              const fileName = fileData instanceof File ? fileData.name : (hasFile ? t('register.existing_document') : t('register.upload') + req.name)
-              
+              const reqFiles = files[req.id] || []
               return (
-                <label key={req.id} className={`flex items-center gap-3 p-4 neu-pressed rounded-3xl cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                  <div className="w-10 h-10 neu-circle flex items-center justify-center shrink-0">
-                    {hasFile ? <span className="text-lg">✅</span> : <Paperclip className="w-4 h-4 text-blue-500" />}
+                <div key={req.id} className={`p-4 neu-pressed rounded-3xl ${submitting ? 'opacity-50' : ''}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-sm font-bold text-slate-700">{req.name}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{req.required ? t('register.required') : t('register.optional')}</p>
+                    </div>
+                    <label className="neu-circle w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-slate-50">
+                      <Paperclip className="w-4 h-4 text-blue-600" />
+                      <input type="file" multiple accept="image/*,.pdf" className="hidden" disabled={submitting} onChange={e => {
+                        if (!e.target.files) return;
+                        const arr = Array.from(e.target.files);
+                        setFiles(prev => ({ ...prev, [req.id]: [...(prev[req.id] || []), ...arr] }))
+                      }} />
+                    </label>
                   </div>
-                  <div className="truncate flex-1">
-                    <p className="text-sm font-bold text-slate-700 truncate">
-                      {fileName}
-                    </p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                      {req.required ? t('register.required') : t('register.optional')}
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    className="hidden"
-                    disabled={submitting}
-                    onChange={e => {
-                      const newFile = e.target.files?.[0]
-                      if (newFile) setFiles(f => ({ ...f, [req.id]: newFile }))
-                    }}
-                  />
-                </label>
+                  
+                  {reqFiles.length > 0 && (
+                    <div className="space-y-2 mt-3">
+                      {reqFiles.map((file, idx) => {
+                        const name = file instanceof File ? file.name : (req.name + ' ' + (idx + 1))
+                        return (
+                          <div key={idx} className="flex items-center justify-between bg-white/50 border border-slate-200 rounded-2xl p-2 text-xs font-semibold text-slate-600 shadow-sm">
+                            <span className="truncate max-w-[200px]">{name}</span>
+                            <button type="button" disabled={submitting} onClick={() => {
+                              setFiles(prev => ({
+                                ...prev,
+                                [req.id]: prev[req.id].filter((_, i) => i !== idx)
+                              }))
+                            }} className="p-1 hover:bg-red-50 text-red-500 rounded">
+                              <span className="w-3 h-3">✖</span>
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
               )
             })}
           </div>
 
-          {/* Appeal reason */}
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('appeal.reason_label')}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Note / Appeal Reason (Optional)</p>
             <textarea
               rows={4}
               placeholder={t('appeal.reason_placeholder')}
@@ -282,9 +297,9 @@ export default function AppealModal({ driver, onClose }: AppealModalProps) {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full p-4 rounded-3xl font-black bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white shadow-[0_8px_20px_rgba(245,158,11,0.35)] transition-colors"
+            className="w-full p-4 rounded-3xl font-black bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white shadow-[0_8px_20px_rgba(59,130,246,0.35)] transition-colors"
           >
-            {submitting ? t('appeal.submitting') : t('appeal.submit')}
+            {submitting ? 'Saving...' : 'Save Registration'}
           </button>
         </form>
       </div>
