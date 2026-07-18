@@ -17,12 +17,30 @@ async function uploadDocument(f: File): Promise<string> {
   const { signedUrl, publicUrl } = await api.post('/upload/document/presigned', {
     filename: f.name,
   })
+  let mimeType = f.type;
+  if (!mimeType) {
+    const ext = f.name.split('.').pop()?.toLowerCase();
+    if (ext === 'jpg' || ext === 'jpeg') mimeType = 'image/jpeg';
+    else if (ext === 'png') mimeType = 'image/png';
+    else if (ext === 'webp') mimeType = 'image/webp';
+    else if (ext === 'pdf') mimeType = 'application/pdf';
+    else mimeType = 'application/octet-stream';
+  }
+
   const res = await fetch(signedUrl, {
     method: 'PUT',
     body: f,
-    headers: { 'Content-Type': f.type || 'application/octet-stream' },
+    headers: { 'Content-Type': mimeType },
   })
-  if (!res.ok) throw new Error('Failed to upload document to storage')
+  if (!res.ok) {
+    let msg = 'Failed to upload document to storage';
+    try {
+      const errData = await res.json();
+      if (errData.message) msg = errData.message;
+      if (errData.error === 'Payload Too Large') msg = 'File is too large. Max size is 20MB.';
+    } catch {}
+    throw new Error(msg);
+  }
   return publicUrl
 }
 

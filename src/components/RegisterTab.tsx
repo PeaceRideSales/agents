@@ -53,10 +53,20 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
       filename: f.name
     })
 
+    let mimeType = f.type;
+    if (!mimeType) {
+      const ext = f.name.split('.').pop()?.toLowerCase();
+      if (ext === 'jpg' || ext === 'jpeg') mimeType = 'image/jpeg';
+      else if (ext === 'png') mimeType = 'image/png';
+      else if (ext === 'webp') mimeType = 'image/webp';
+      else if (ext === 'pdf') mimeType = 'application/pdf';
+      else mimeType = 'application/octet-stream';
+    }
+
     await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest()
       xhr.open('PUT', signedUrl)
-      xhr.setRequestHeader('Content-Type', f.type || 'application/octet-stream')
+      xhr.setRequestHeader('Content-Type', mimeType)
       
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
@@ -66,7 +76,15 @@ export default function RegisterTab({ onSuccess }: RegisterTabProps) {
       
       xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.response)
-        else reject(new Error('Failed to upload file to storage'))
+        else {
+          let msg = 'Failed to upload file to storage';
+          try {
+            const errData = JSON.parse(xhr.response);
+            if (errData.message) msg = errData.message;
+            if (errData.error === 'Payload Too Large') msg = 'File is too large. Max size is 20MB.';
+          } catch {}
+          reject(new Error(msg));
+        }
       }
       xhr.onerror = () => reject(new Error('Failed to upload file to storage'))
       xhr.send(f)
